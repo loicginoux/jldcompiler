@@ -12,7 +12,7 @@ public class TDS extends HashMap<String, INFO> {
 
 	public TDS() {
 		super();
-		parente=null;
+		parente = null;
 	}
 
 	public TDS(TDS p) {
