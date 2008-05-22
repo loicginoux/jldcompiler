@@ -1,1 +1,0 @@
-/usr/local/jdk1.6/bin/java -cp /usr/local/gen6/egg502/eggc.jar:. mjc.compiler.MJC $*
