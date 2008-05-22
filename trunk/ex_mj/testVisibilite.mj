@@ -1,0 +1,16 @@
+class TestVisibilite{
+  int rien;
+  public int pub;
+  private int pri;
+  protected int pro;
+  static int sta;
+  public static int pusta;
+  private static int pristat;
+  protected static int prostat;
+  static public int statpub;
+  static private int statpriv;
+  static protected int statprot;
+  static static int statstat;
+  public private int publpriv;
+  
+  }
