@@ -1,0 +1,25 @@
+import Point;
+import PointCol;
+
+class Geo {
+  public void main ( int args ) {
+    Point p = new Point();
+    Point p1 = new Point();
+    PointCol pc = new PointCol();
+    int l;
+    p.init(5,4);
+    p1.init(6,2);
+    pc.init(6,1);
+    Point m ;
+    m = p.milieu(p1);
+    Point m1 ;
+    m1 = p.milieu(pc);
+    Point m2 ;
+    m2 = pc.milieu(p);
+    Point m3 ;
+    m3 = pc.milieu(pc);
+    l = p.type();
+    p = pc;
+    l = p.type();
+  }
+}

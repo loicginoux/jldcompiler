@@ -1,0 +1,52 @@
+class Point {
+  protected int x;
+  protected int y;
+  static public Point origine;
+
+  public Point(int a, int b){
+    x = a;
+    y = b;
+    origine = null;
+    }
+
+  public Point(Point autre){
+    x = autre.getx();
+    y = autre.gety();
+    }
+
+  public int getx() {
+    return x;
+    }
+    
+  public int gety() {
+    return y;
+    }
+    
+  public void setx(int l) {
+    x = l;
+    }
+    
+  public void sety(int l) {
+    y = l;
+    }
+  
+  public void init (int xi,int yi) {
+    x = xi;
+    y = yi;
+    }
+        
+  public void xtrans(int d){
+    x = x + d;
+    }
+
+  public void ytrans(int d){
+    y = y + d;
+    }
+    
+  public Point milieu (Point p){
+    Point m = new Point();
+    m.init((x + p.x)/2, (y + p.y)/2);
+    return m;
+    }
+  }
+
