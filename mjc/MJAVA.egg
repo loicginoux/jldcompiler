@@ -111,7 +111,7 @@ DEFQUAL -> #visibility;
 
     #visibility {
         do
-            DEFQUAL^visibility := new Couple(-1, false); -- penser a le mettre public apres le DEFQUAL si toujours -1
+            DEFQUAL^visibility := new COUPLE(-1, false); -- penser a le mettre public apres le DEFQUAL si toujours -1
         end
     }
     
@@ -120,7 +120,7 @@ DEFQUAL -> public DEFQUAL #visibility;
     #visibility {
         do
             if DEFQUAL1^visibility.getGauche() = -1 then
-                DEFQUAL^visibility := new Couple(0, DEFQUAL1^visibility.getDroite());
+                DEFQUAL^visibility := new COUPLE(0, DEFQUAL1^visibility.getDroite());
             else
                 -- erreur("visibilite deja declaree")
             end
@@ -132,7 +132,7 @@ DEFQUAL -> prive DEFQUAL #visibility;
     #visibility {
         do
             if DEFQUAL1^visibility.getGauche() = -1 then
-                DEFQUAL^visibility := new Couple(1, DEFQUAL1^visibility.getDroite());
+                DEFQUAL^visibility := new COUPLE(1, DEFQUAL1^visibility.getDroite());
             else
                 -- erreur("visibilite deja declaree")
             end
@@ -144,7 +144,7 @@ DEFQUAL -> protect DEFQUAL #visibility;
     #visibility {
         do
             if DEFQUAL1^visibility.getGauche() = -1 then
-                DEFQUAL^visibility := new Couple(2, DEFQUAL1^visibility.getDroite());
+                DEFQUAL^visibility := new COUPLE(2, DEFQUAL1^visibility.getDroite());
             else
                 -- erreur("visibilite deja declaree")
             end
@@ -156,7 +156,7 @@ DEFQUAL -> static DEFQUAL #visibility;
     #visibility {
         do
             if !DEFQUAL1^visibility.getDroite() then
-                DEFQUAL^visibility := new Couple(DEFQUAL1^visibility.getGauche(), true);
+                DEFQUAL^visibility := new COUPLE(DEFQUAL1^visibility.getGauche(), true);
             else
                 -- erreur("deja statique")
             end

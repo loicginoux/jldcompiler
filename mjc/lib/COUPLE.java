@@ -14,7 +14,7 @@ public class COUPLE {
 		this.gauche = gauche;
 	}
 
-	public boolean isDroite() {
+	public boolean getDroite() {
 		return droite;
 	}
 
