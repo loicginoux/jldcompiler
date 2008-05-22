@@ -1,0 +1,197 @@
+------------------------------------------
+-- PROJET 07-08 - micro java : grammaire LL(3)
+-- au format EGG5
+------------------------------------------
+option auto= true;
+option version = 0.0.1 ;
+option k=3;
+
+-- les attributs semantiques
+inh source : MJAVASourceFile for PROGRAMME;
+-- les terminaux 
+
+space separateur is  "[\r\n\t ]+";
+space comm is  "\/\/[^\n]*\n";
+sugar import is  "import";
+sugar paro is  "\(";
+sugar parf is  "\)";
+sugar aco is  "\{";
+sugar acf is  "\}";
+sugar cro is  "\[";
+sugar crf is  "\]";
+sugar virg is  ",";
+sugar pv is  "\;";
+sugar pt is  "\.";
+sugar affect is  "=";
+sugar si is  "if";
+sugar sinon is  "else";
+sugar tantque is  "while";
+sugar void is  "void";
+sugar int is  "int";
+sugar bool is  "boolean";
+sugar classe is  "class";
+sugar etend is  "extends";
+sugar retour is  "return";
+sugar nouveau is  "new";
+sugar public is  "public";
+sugar prive is  "private";
+sugar protect is  "protected";
+sugar static is  "static";
+sugar nil is  "null";
+sugar inf is  "\<";
+sugar infeg is  "\<=";
+sugar sup is  "\>";
+sugar supeg is  "\>=";
+sugar eg is  "==";
+sugar neg is  "\!=";
+sugar plus is  "\+";
+sugar moins is  "\-";
+sugar ou is  "\|\|";
+sugar mult is  "\*";
+sugar div is  "\/";
+sugar mod is  "\%" ; 
+sugar et is  "\&\&";
+sugar non is  "\!";
+sugar vrai is  "true";
+sugar faux is  "false";
+sugar this is  "this";
+sugar super is  "super";
+term entier is  "[0-9]+";
+term ident is  "[_A-Za-z][_0-9A-Za-z]*";
+
+---------- REGLES DE PRODUCTION ----------------------------------------
+PROGRAMME -> #init IMPORTS DEFCLASSE #gen ;
+global
+   machine : AbstractMachine;
+   
+#init {
+local
+do
+   machine := PROGRAMME^source.getMachine();
+end
+}
+
+#gen {
+local
+do
+  call machine.writeCode(PROGRAMME^source.getFileName(), "");
+end
+}
+
+IMPORTS -> ;
+IMPORTS -> import ident pv IMPORTS ;
+-- definition d'une classe
+DEFCLASSE -> classe ident EXTENSION aco DEFS acf ;
+-- heritage
+EXTENSION -> etend ident ;
+EXTENSION -> ;
+-- les attributs
+DEFS ->   ;
+DEFS ->  DEFQUAL DEF DEFS   ;
+-- public, private, protected, static
+DEFQUAL -> ;
+DEFQUAL -> public DEFQUAL ;
+DEFQUAL -> prive DEFQUAL ;
+DEFQUAL -> protect DEFQUAL ;
+DEFQUAL -> static DEFQUAL ;
+-- attribut
+DEF ->  TYPE ident pv  ;
+-- methode (fonction)
+DEF ->  TYPE ident paro PARFS parf BLOC  ;
+-- methode (procedure)
+DEF -> void ident  paro PARFS parf BLOC  ; 
+-- constructeur
+DEF -> ident  paro PARFS parf BLOC  ; 
+-- classe interne
+DEF -> DEFCLASSE ;
+-- les types
+TYPE-> int  ;
+TYPE-> bool ;
+TYPE-> ident ;
+-- parametres de methodes
+PARFS ->  ;
+PARFS ->  PARF PARFSX ;
+PARFSX ->  ;
+PARFSX -> virg  PARF  PARFSX ;
+PARF ->  TYPE ident  ;
+-- corps de methode et bloc d'instructions
+BLOC ->  aco INSTS acf  ;
+-- instructions
+INSTS ->   ;
+INSTS ->  INST INSTS  ;
+-- declaration de variable locale avec ou sans init
+INST->  TYPE ident AFFX pv ;
+-- instruction expression
+INST ->  E pv ;
+-- bloc d'instructions
+INST ->  BLOC  ;
+-- conditionnelle
+INST ->  si paro E parf BLOC SIX ;
+SIX ->   sinon BLOC ;
+SIX ->;
+-- return
+INST ->  retour E pv ;
+-- tant que
+INST ->  tantque paro E parf BLOC ;
+-- les expressions
+E ->  ER AFFX ;
+-- affectation
+AFFX ->  affect ER  ;
+AFFX -> ;
+-- relation
+ER ->   ES ERX ;
+ES ->  T ESX ;
+ERX ->  OPREL ES ;
+ERX -> ;
+OPREL -> inf ;
+OPREL -> infeg ;
+OPREL -> sup ;
+OPREL -> supeg ;
+OPREL -> eg ;
+OPREL -> neg ;
+-- addition, ...
+ESX ->   OPADD T ESX ;
+ESX ->;
+OPADD -> plus ;
+OPADD -> moins ;
+OPADD -> ou ;
+T ->  F TX ;
+-- multiplication, ...
+TX ->   OPMUL F TX ;
+TX -> ;
+OPMUL -> mult ;
+OPMUL -> div ;
+OPMUL -> mod ;
+OPMUL -> et ;
+-- expressions de base
+F -> entier  ;
+F -> vrai  ;
+F -> faux  ;
+-- unaire
+F ->  OPUN F ;
+OPUN -> plus;
+OPUN -> moins;
+OPUN -> non;
+-- null
+F -> nil  ;
+F ->  paro E parf ;
+-- new
+F -> nouveau  TYPE paro ARGS parf  ;
+-- this 
+F -> this Q ;
+-- appel super 
+F ->  super Q ;
+-- acces variable ou methode 
+F ->  ident Q ;
+-- Q = qualificateur de variable
+Q ->  ;
+-- acces attribut
+Q ->  pt ident  Q ;
+-- arguments d'appel de methode
+Q ->  paro ARGS parf Q ;
+ARGS ->  E ARGSX  ;
+ARGS -> ;
+ARGSX ->   virg E ARGSX  ;
+ARGSX -> ;
+
+end
