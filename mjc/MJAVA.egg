@@ -8,6 +8,8 @@ option k=3;
 
 -- les attributs semantiques
 inh source : MJAVASourceFile for PROGRAMME;
+inh tds : TDS for IMPORTS, DEFCLASSE, DEF, DEFS;
+syn visibility : COUPLE for DEFQUAL;
 -- les terminaux 
 
 space separateur is  "[\r\n\t ]+";
@@ -60,28 +62,44 @@ term entier is  "[0-9]+";
 term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
 ---------- REGLES DE PRODUCTION ----------------------------------------
-PROGRAMME -> #init IMPORTS DEFCLASSE #gen ;
-global
-   machine : AbstractMachine;
+PROGRAMME -> #init #tds IMPORTS DEFCLASSE #gen ;
+    global
+       machine : AbstractMachine;
    
-#init {
-local
-do
-   machine := PROGRAMME^source.getMachine();
-end
-}
+    #init {
+        local
+        do
+           machine := PROGRAMME^source.getMachine();
+        end
+    }
+    
+    #tds {
+        local
+            tds : TDS;
+        do
+            tds := new TDS();
+            IMPORTS^tds := tds;
+            DEFCLASSE^tds := tds;
+        end
+    }
 
-#gen {
-local
-do
-  call machine.writeCode(PROGRAMME^source.getFileName(), "");
-end
-}
+    #gen {
+        local
+        do
+          call machine.writeCode(PROGRAMME^source.getFileName(), "");
+        end
+    }
 
 IMPORTS -> ;
 IMPORTS -> import ident pv IMPORTS ;
 -- definition d'une classe
-DEFCLASSE -> classe ident EXTENSION aco DEFS acf ;
+DEFCLASSE -> classe ident #type EXTENSION aco DEFS acf ;
+
+    #type {
+        do
+            
+        end
+    }
 -- heritage
 EXTENSION -> etend ident ;
 EXTENSION -> ;
@@ -89,11 +107,61 @@ EXTENSION -> ;
 DEFS ->   ;
 DEFS ->  DEFQUAL DEF DEFS   ;
 -- public, private, protected, static
-DEFQUAL -> ;
-DEFQUAL -> public DEFQUAL ;
-DEFQUAL -> prive DEFQUAL ;
-DEFQUAL -> protect DEFQUAL ;
-DEFQUAL -> static DEFQUAL ;
+DEFQUAL -> #visibility;
+
+    #visibility {
+        do
+            DEFQUAL^visibility := new Couple(-1, false); -- penser a le mettre public apres le DEFQUAL si toujours -1
+        end
+    }
+    
+DEFQUAL -> public DEFQUAL #visibility;
+
+    #visibility {
+        do
+            if DEFQUAL1^visibility.getGauche() = -1 then
+                DEFQUAL^visibility := new Couple(0, DEFQUAL1^visibility.getDroite());
+            else
+                -- erreur("visibilite deja declaree")
+            end
+        end
+    }
+    
+DEFQUAL -> prive DEFQUAL #visibility;
+
+    #visibility {
+        do
+            if DEFQUAL1^visibility.getGauche() = -1 then
+                DEFQUAL^visibility := new Couple(1, DEFQUAL1^visibility.getDroite());
+            else
+                -- erreur("visibilite deja declaree")
+            end
+        end
+    }
+    
+DEFQUAL -> protect DEFQUAL #visibility;
+
+    #visibility {
+        do
+            if DEFQUAL1^visibility.getGauche() = -1 then
+                DEFQUAL^visibility := new Couple(2, DEFQUAL1^visibility.getDroite());
+            else
+                -- erreur("visibilite deja declaree")
+            end
+        end
+    }
+    
+DEFQUAL -> static DEFQUAL #visibility;
+
+    #visibility {
+        do
+            if !DEFQUAL1^visibility.getDroite() then
+                DEFQUAL^visibility := new Couple(DEFQUAL1^visibility.getGauche(), true);
+            else
+                -- erreur("deja statique")
+            end
+        end
+    }
 -- attribut
 DEF ->  TYPE ident pv  ;
 -- methode (fonction)
