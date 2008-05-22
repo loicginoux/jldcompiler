@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/mg.egg.runtime_5.0.2/lib/eggc.jar"/>
-	<classpathentry kind="src" path=""/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
