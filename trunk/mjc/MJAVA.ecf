@@ -14,6 +14,6 @@
   >
     <import    lib="mjc.compiler.*"/>
     <import    lib="mjc.gc.*"/>
-    <!--<import    lib="mjc.type.*"/>
-    <import    lib="mjc.tds.*"/> -->
+    <import    lib="mjc.lib.*"/>
+    <import    lib="mjc.tds.*"/>
   </egg>
