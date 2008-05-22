@@ -2,8 +2,6 @@ package mjc.tdt;
 
 import java.util.HashMap;
 
-import mjc.tds.INFO;
-
 public class TDT extends HashMap<String, INFO> {
 	
 	private static final long serialVersionUID = 1L;
@@ -11,7 +9,13 @@ public class TDT extends HashMap<String, INFO> {
 	private static HashMap<String, INFO> tdt;
 	
 	public TDT() {
-		super();
+		if(true) { //le fichier avec les TDT existantes n'existe pas
+			tdt = new HashMap<String, INFO>();
+			tdt.put("int", new INFO(1,"NULL"));
+			tdt.put("boolean", new INFO(1,"NULL"));
+		} else {
+			//ouvrir le fichier et charger la table...
+		}
 	}
 	
 	public INFO chercher(String n) {

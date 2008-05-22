@@ -15,6 +15,12 @@ public class INFO {
 		listeChamps = new HashMap<String, String>();
 	}
 	
+	public INFO(int taille, String extention) {
+		this.taille = taille;
+		this.extention = extention;
+		listeChamps = new HashMap<String, String>();
+	}
+	
 	public int getTaille() {
 		return taille;
 	}
