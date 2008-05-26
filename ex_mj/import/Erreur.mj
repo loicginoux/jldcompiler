@@ -1,0 +1,10 @@
+import testImportUN;
+import testImportUN; //warning double import
+//import INEXISTANT; //inexistant
+
+//redefinition dun import
+//extends inexistant
+class testImportUN extends INEXISTANT2{
+
+
+}

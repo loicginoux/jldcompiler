@@ -16,4 +16,6 @@
     <import    lib="mjc.gc.*"/>
     <import    lib="mjc.lib.*"/>
     <import    lib="mjc.tds.*"/>
+    <import    lib="mjc.tdt.*"/>
+    <import    lib="java.util.*"/>
   </egg>

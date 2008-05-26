@@ -1,10 +1,11 @@
 package mjc.tds;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TDS extends HashMap<String, INFO> {
+public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +41,7 @@ public class TDS extends HashMap<String, INFO> {
 		StringBuffer sb = new StringBuffer();
 		Set<Map.Entry<String, INFO>> s = entrySet();
 		for (Map.Entry<String, INFO> e : s){
-			sb.append("; " + e.getKey() + " : " + e.getValue() + '\n');
+			sb.append("var " + e.getKey() + " : " + e.getValue() + '\n');
 		
 		}
 		return sb.toString();
