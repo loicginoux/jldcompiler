@@ -1,4 +1,4 @@
-class TestVisibilite{
+class testVisibilite{
   int rien;
   public int pub;
   private int pri;

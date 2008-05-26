@@ -1,0 +1,6 @@
+import testImportUN; 
+import testImportDEUX; //deux importe deja un mais ce n'est pas un include !!!
+
+class testImportTROIS {
+
+}

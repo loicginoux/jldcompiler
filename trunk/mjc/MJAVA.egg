@@ -8,8 +8,13 @@ option k=3;
 
 -- les attributs semantiques
 inh source : MJAVASourceFile for PROGRAMME;
+
 inh tds : TDS for IMPORTS, DEFCLASSE, DEF, DEFS;
-syn visibility : COUPLE for DEFQUAL;
+
+inh tdt : TDT for DEFCLASSE,EXTENSION,DEF,DEFS;
+syn tdts : List<TDT> for IMPORTS;
+
+syn visibility : COUPLE<Integer,Boolean> for DEFQUAL;
 -- les terminaux 
 
 space separateur is  "[\r\n\t ]+";
@@ -61,10 +66,13 @@ sugar super is  "super";
 term entier is  "[0-9]+";
 term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
+
 ---------- REGLES DE PRODUCTION ----------------------------------------
-PROGRAMME -> #init #tds IMPORTS DEFCLASSE #gen ;
+PROGRAMME -> #init #tds IMPORTS #tdt DEFCLASSE #gen ;
     global
        machine : AbstractMachine;
+       tds:TDS;
+       tdt:TDT;
    
     #init {
         local
@@ -74,34 +82,99 @@ PROGRAMME -> #init #tds IMPORTS DEFCLASSE #gen ;
     }
     
     #tds {
-        local
-            tds : TDS;
         do
             tds := new TDS();
             IMPORTS^tds := tds;
             DEFCLASSE^tds := tds;
         end
     }
+    #tdt{
+    do
+        tdt := new TDT("anonyme",IMPORTS^tdts);
+        DEFCLASSE^tdt := tdt;
+    end
+    }
 
     #gen {
-        local
         do
+          write ";TDS : " + tds;
+          write "\n\n;TDT : "+tdt+"\n";
           call machine.writeCode(PROGRAMME^source.getFileName(), "");
         end
     }
 
-IMPORTS -> ;
-IMPORTS -> import ident pv IMPORTS ;
+IMPORTS -> #tdts;
+#tdts{
+do
+    IMPORTS^tdts := new Vector<TDT>();
+end
+}
+IMPORTS -> import ident pv IMPORTS #tdts;
+#tdts{
+local 
+    fac:Factory;
+    tdt:TDT;
+    tdts:List<TDT>;
+do
+    fac := new Factory();
+    tdt := fac.chargerTDT(ident^txt);
+    if tdt=nil then
+        error(B_02,ident^txt);
+    end   
+    --write "\ntdtimport:"+tdt+"\n"; 
+    tdts := IMPORTS1^tdts;
+    if tdts.contains(tdt) & tdt/=nil then
+        warning(B_01,ident^txt);
+        IMPORTS^tdts := tdts;
+    else
+        call tdts.add(tdt);
+        IMPORTS^tdts := tdts;
+    end
+end
+}
 -- definition d'une classe
-DEFCLASSE -> classe ident #type EXTENSION aco DEFS acf ;
+DEFCLASSE -> classe ident #tdt EXTENSION aco DEFS acf #sauv;
 
-    #type {
-        do
-            
-        end
+#tdt {
+local 
+    type:Type;
+do
+    type := DEFCLASSE^tdt.chercherLocalement(ident^txt);
+    if type=nil then
+        call DEFCLASSE^tdt.setClassname(ident^txt);
+    else
+        error(B_03,ident^txt); --redefinition d'une classe importe
+    end      
+    EXTENSION^tdt := DEFCLASSE^tdt; --auto par egg
+end
+}
+    
+    #sauv{
+    local
+        fac:Factory;
+    do
+        fac := new Factory();
+        call fac.persister(DEFCLASSE^tds,ident^txt+".tds");
+        call fac.persister(DEFCLASSE^tdt,ident^txt+".tdt");
+    end
     }
 -- heritage
-EXTENSION -> etend ident ;
+EXTENSION -> etend ident #tdt;
+#tdt{
+local
+    type:Type;
+    monType:Type;
+do
+    type:=EXTENSION^tdt.chercherLocalement(ident^txt);
+    if type/=nil then
+        monType := EXTENSION^tdt.getMonType();
+        call monType.setClassExtends(ident^txt);
+        call monType.setTaille(type.getTaille()); --TODO reflechir
+    else
+        error(B_04,ident^txt);
+    end
+end
+}
 EXTENSION -> ;
 -- les attributs
 DEFS ->   ;
