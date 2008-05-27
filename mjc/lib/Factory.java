@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import mjc.tdm.TDM;
 import mjc.tds.TDS;
 import mjc.tdt.TDT;
 
@@ -18,6 +19,9 @@ public class Factory {
 			FileOutputStream fos = new FileOutputStream(new File(filename));
 			ObjectOutputStream oos =  new ObjectOutputStream(fos);
 			oos.writeObject(t);
+			
+			oos.close();
+			fos.close();
 		}catch(Exception e){
 			throw new RuntimeException("Impossible de persister la TDT : "+e);
 		}
@@ -25,10 +29,13 @@ public class Factory {
 	
 	public static TDT chargerTDT(String classname){
 		String filename=classname+".tdt";
+		ObjectInputStream ois=null;
 		try {
 			FileInputStream fis = new FileInputStream(new File(filename));
-			ObjectInputStream ois = new ObjectInputStream(fis);
+			ois = new ObjectInputStream(fis);
 			TDT ret = (TDT) ois.readObject();
+			ois.close();
+			fis.close();
 			//System.out.println("class"+classname+"ret"+ret);
 			return ret;
 		} catch (FileNotFoundException e) {
@@ -43,7 +50,26 @@ public class Factory {
 		try {
 			FileInputStream fis = new FileInputStream(new File(filename));
 			ObjectInputStream ois = new ObjectInputStream(fis);
-			return (TDS) ois.readObject();
+			TDS ret = (TDS) ois.readObject();
+			ois.close();
+			fis.close();
+			return ret;
+		} catch (FileNotFoundException e) {
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException("Impossible de charger la TDS : "+e);
+		}
+	}
+	
+	public static TDM chargerTDM(String classname){
+		String filename=classname+".tdm";
+		try {
+			FileInputStream fis = new FileInputStream(new File(filename));
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			TDM ret = (TDM) ois.readObject();
+			ois.close();
+			fis.close();
+			return ret;
 		} catch (FileNotFoundException e) {
 			return null;
 		} catch (Exception e) {

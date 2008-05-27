@@ -1,4 +1,9 @@
 
 class testImportUN {
 
+	int x;
+	int y;
+	int z;
+	
+
 }

@@ -9,12 +9,19 @@ option k=3;
 -- les attributs semantiques
 inh source : MJAVASourceFile for PROGRAMME;
 
-inh tds : TDS for IMPORTS, DEFCLASSE, DEF, DEFS;
+inh tds : TDS for  DEFCLASSE,EXTENSION, DEFS,DEF;
 
-inh tdt : TDT for DEFCLASSE,EXTENSION,DEF,DEFS;
+inh tdm : TDM for DEFCLASSE,EXTENSION,DEFS,DEF;
+syn params : List<String> for PARFS,PARFSX;
+syn param : String for PARF;
+
+inh tdt : TDT for DEFCLASSE,EXTENSION,DEF,DEFS,PARFSX,PARFS,PARF;
 syn tdts : List<TDT> for IMPORTS;
 
 syn visibility : COUPLE<Integer,Boolean> for DEFQUAL;
+inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
+
+syn nom : String for TYPE;
 -- les terminaux 
 
 space separateur is  "[\r\n\t ]+";
@@ -68,11 +75,12 @@ term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
 
 ---------- REGLES DE PRODUCTION ----------------------------------------
-PROGRAMME -> #init #tds IMPORTS #tdt DEFCLASSE #gen ;
+PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     global
        machine : AbstractMachine;
        tds:TDS;
        tdt:TDT;
+       tdm:TDM;
    
     #init {
         local
@@ -84,7 +92,6 @@ PROGRAMME -> #init #tds IMPORTS #tdt DEFCLASSE #gen ;
     #tds {
         do
             tds := new TDS();
-            IMPORTS^tds := tds;
             DEFCLASSE^tds := tds;
         end
     }
@@ -94,13 +101,31 @@ PROGRAMME -> #init #tds IMPORTS #tdt DEFCLASSE #gen ;
         DEFCLASSE^tdt := tdt;
     end
     }
+    #tdm{
+    do
+        tdm := new TDM();
+        DEFCLASSE^tdm := tdm;
+    end
+    }
 
     #gen {
         do
           write ";TDS : " + tds;
           write "\n\n;TDT : "+tdt+"\n";
+           write "\n\n;TDM : "+tdm+"\n";
           call machine.writeCode(PROGRAMME^source.getFileName(), "");
         end
+    }
+    
+    #sauv{
+    local
+        fac:Factory;
+    do
+        fac := new Factory();
+        call fac.persister(tds,tdt.getClassname()+".tds");
+        call fac.persister(tdt,tdt.getClassname()+".tdt");
+        call fac.persister(tdm,tdt.getClassname()+".tdm");
+    end
     }
 
 IMPORTS -> #tdts;
@@ -121,7 +146,7 @@ do
     if tdt=nil then
         error(B_02,ident^txt);
     end   
-    --write "\ntdtimport:"+tdt+"\n"; 
+    write "\ntdtimport:"+tdt+"\n"; 
     tdts := IMPORTS1^tdts;
     if tdts.contains(tdt) & tdt/=nil then
         warning(B_01,ident^txt);
@@ -133,7 +158,7 @@ do
 end
 }
 -- definition d'une classe
-DEFCLASSE -> classe ident #tdt EXTENSION aco DEFS acf #sauv;
+DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf ;
 
 #tdt {
 local 
@@ -148,18 +173,15 @@ do
     EXTENSION^tdt := DEFCLASSE^tdt; --auto par egg
 end
 }
+
+#tdm{
+do
+    call DEFCLASSE^tdm.setClassname(ident^txt);
+end
+}
     
-    #sauv{
-    local
-        fac:Factory;
-    do
-        fac := new Factory();
-        call fac.persister(DEFCLASSE^tds,ident^txt+".tds");
-        call fac.persister(DEFCLASSE^tdt,ident^txt+".tdt");
-    end
-    }
 -- heritage
-EXTENSION -> etend ident #tdt;
+EXTENSION -> etend ident #tdt #tds #tdm;
 #tdt{
 local
     type:Type;
@@ -169,16 +191,47 @@ do
     if type/=nil then
         monType := EXTENSION^tdt.getMonType();
         call monType.setClassExtends(ident^txt);
-        call monType.setTaille(type.getTaille()); --TODO reflechir
+        call monType.setTaille(1); --taille du pointeur super
     else
         error(B_04,ident^txt);
     end
 end
 }
+
+#tds{
+local
+    fac:Factory;
+    i:INFO;
+do
+    fac := new Factory();
+    call  EXTENSION^tds.setParente(fac.chargerTDS(ident^txt));
+    i := new INFO();
+    call i.setDep(0); -- plus tard
+    call i.setStatique(false);
+    call i.setVisibility(1); -- le super est private
+    call i.setType(ident^txt);
+    call EXTENSION^tds.inserer("super",i);
+end
+}
+
+#tdm{
+local
+    fac:Factory;
+do
+    fac := new Factory();
+    call  EXTENSION^tdm.setParente(fac.chargerTDM(ident^txt));
+end
+}
+
 EXTENSION -> ;
 -- les attributs
 DEFS ->   ;
-DEFS ->  DEFQUAL DEF DEFS   ;
+DEFS ->  DEFQUAL #tdsVis DEF DEFS   ;
+#tdsVis{
+do
+    DEF^visibilitySyn := DEFQUAL^visibility;
+end
+}
 -- public, private, protected, static
 DEFQUAL -> #visibility;
 
@@ -236,9 +289,65 @@ DEFQUAL -> static DEFQUAL #visibility;
         end
     }
 -- attribut
-DEF ->  TYPE ident pv  ;
+DEF ->  TYPE ident pv #tdt #tds ;
+#tdt{
+local 
+    type:Type;
+do
+   type := DEF^tdt.chercherLocalement(TYPE^nom);
+   if type=nil then
+        error(B_04,TYPE^nom);
+   else
+        type := DEF^tdt.getMonType();
+        call type.setTaille(type.getTaille()+1); --reflechir pour le statique
+   end
+   
+end
+}
+
+#tds{
+local
+    i:INFO;
+do
+    i := DEF^tds.chercherLocalement(ident^txt);
+    if i=nil then
+        i := new INFO();
+        call i.setDep(0); -- plus tard
+        call i.setStatique(DEF^visibilitySyn.getDroite());
+        call i.setVisibility(DEF^visibilitySyn.getGauche());
+        call i.setType(TYPE^nom);
+        call DEF^tds.inserer(ident^txt,i);
+    else
+        error(B_05,ident^txt);
+    end
+end
+}
+
 -- methode (fonction)
-DEF ->  TYPE ident paro PARFS parf BLOC  ;
+DEF ->  TYPE ident paro PARFS parf #tdt #tdm BLOC  ;
+#tdt{
+local
+    t : Type;
+do
+    t := DEF^tdt.chercherLocalement(TYPE^nom);
+    if t = nil then error(B_04, TYPE^nom);
+    else
+    end 
+end
+}
+#tdm{
+local
+    s:Signature;
+do
+    s := new Signature();
+    call s.ajouter(PARFS^params);
+    call s.setStatique(DEF^visibilitySyn.getDroite());
+    call s.setVisibility(DEF^visibilitySyn.getGauche());
+    call s.setRetour(TYPE^nom);
+    call DEF^tdm.inserer(ident^txt,s); -- verifier si la methode existe pas deja
+end
+}
+
 -- methode (procedure)
 DEF -> void ident  paro PARFS parf BLOC  ; 
 -- constructeur
@@ -246,15 +355,55 @@ DEF -> ident  paro PARFS parf BLOC  ;
 -- classe interne
 DEF -> DEFCLASSE ;
 -- les types
-TYPE-> int  ;
-TYPE-> bool ;
-TYPE-> ident ;
+TYPE-> int  #type;
+#type{ do TYPE^nom := "int"; end }
+TYPE-> bool #type;
+#type{ do TYPE^nom := "bool"; end }
+TYPE-> ident #type;
+#type{ do TYPE^nom := ident^txt; end }
 -- parametres de methodes
-PARFS ->  ;
-PARFS ->  PARF PARFSX ;
-PARFSX ->  ;
-PARFSX -> virg  PARF  PARFSX ;
-PARF ->  TYPE ident  ;
+PARFS ->  #params;
+#params{
+do
+    PARFS^params := new Vector<String>();
+end
+}
+PARFS ->  PARF PARFSX #params ;
+#params{
+do
+    call PARFSX^params.add(PARF^param);
+    PARFS^params := PARFSX^params;
+end
+}
+PARFSX -> #params  ;
+#params{
+do
+    PARFSX^params := new Vector<String>();
+end
+}
+PARFSX -> virg  PARF  PARFSX #params;
+#params{
+do
+    call PARFSX1^params.add(PARF^param);
+    PARFSX^params := PARFSX1^params;
+end
+}
+PARF ->  TYPE ident #tdt #param  ;
+#tdt{
+local
+    t : Type;
+do
+    t := PARF^tdt.chercherLocalement(TYPE^nom);
+    if t = nil then  error(B_04, TYPE^nom);
+    else
+    end 
+end
+}
+#param{
+do
+    PARF^param := TYPE^nom;
+end
+}
 -- corps de methode et bloc d'instructions
 BLOC ->  aco INSTS acf  ;
 -- instructions

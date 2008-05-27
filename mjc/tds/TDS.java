@@ -39,11 +39,26 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
+		sb.append("\n");
 		Set<Map.Entry<String, INFO>> s = entrySet();
 		for (Map.Entry<String, INFO> e : s){
 			sb.append("var " + e.getKey() + " : " + e.getValue() + '\n');
 		
 		}
+		
+		if(parente != null){
+		sb.append("parent : ");
+		sb.append(parente.toString());
+		}
+		
 		return sb.toString();
+	}
+
+	public TDS getParente() {
+		return parente;
+	}
+
+	public void setParente(TDS parente) {
+		this.parente = parente;
 	}
 }

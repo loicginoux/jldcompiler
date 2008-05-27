@@ -1,0 +1,1 @@
+protected = public dans notre cas car on ne gere pas les packages.
