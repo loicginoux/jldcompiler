@@ -338,20 +338,60 @@ end
 #tdm{
 local
     s:Signature;
+    stemp:Signature;
 do
     s := new Signature();
     call s.ajouter(PARFS^params);
     call s.setStatique(DEF^visibilitySyn.getDroite());
     call s.setVisibility(DEF^visibilitySyn.getGauche());
     call s.setRetour(TYPE^nom);
-    call DEF^tdm.inserer(ident^txt,s); -- verifier si la methode existe pas deja
+     if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
+        error(B_06,ident^txt,s.toString());
+    else
+    end
+    call DEF^tdm.inserer(ident^txt+"_"+s.getStringParams(),s); 
 end
 }
 
 -- methode (procedure)
-DEF -> void ident  paro PARFS parf BLOC  ; 
+DEF -> void ident  paro PARFS parf #tdm  BLOC  ; 
+#tdm{
+local
+    s:Signature;
+    stemp:Signature; 
+do
+    s := new Signature();
+    call s.ajouter(PARFS^params);
+    call s.setStatique(DEF^visibilitySyn.getDroite());
+    call s.setVisibility(DEF^visibilitySyn.getGauche());
+    call s.setRetour(nil);
+    if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
+        error(B_06,ident^txt,s.toString());
+    else
+    end
+    call DEF^tdm.inserer(ident^txt+"_"+s.getStringParams(),s); 
+end
+}
 -- constructeur
-DEF -> ident  paro PARFS parf BLOC  ; 
+DEF -> ident  paro PARFS parf #tdm BLOC  ; 
+#tdm{
+local
+    s:Signature;
+    stemp:Signature; 
+do
+    s := new Signature();
+    call s.ajouter(PARFS^params);
+    call s.setStatique(DEF^visibilitySyn.getDroite());
+    call s.setVisibility(DEF^visibilitySyn.getGauche());
+    call s.setRetour(DEF^tdt.getClassname());
+    
+    if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
+        error(B_06,ident^txt,s.toString());
+    else
+    end
+    call DEF^tdm.inserer(ident^txt+"_"+s.getStringParams(),s); 
+end
+}
 -- classe interne
 DEF -> DEFCLASSE ;
 -- les types
