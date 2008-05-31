@@ -19,5 +19,33 @@ public class SPARC extends AbstractMachine {
 	public String genReturn(String nomMethode, TDM tdm) {
 		return "";
 	}
+	
+	public String genTrue() {
+		return "";
+	}
+    
+    public String genFalse() {
+    	return "";
+	}
+    
+    public String genNull() {
+    	return "";
+	}
+    
+    public String genInt(String i) {
+    	return "";
+	}
+    
+    public String genPlusInt() {
+		return "";
+	}
+    
+    public String genMoinsInt() {
+    	return "";
+	}
+    
+    public String genNegation() {
+    	return "";
+	}
 
 }
