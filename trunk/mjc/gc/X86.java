@@ -47,5 +47,57 @@ public class X86 extends AbstractMachine {
     public String genNegation() {
     	return "";
 	}
+    
+    public String genInf() {
+    	return "";
+	}
+    
+    public String genInfEg() {
+    	return "";
+	}
+    
+    public String genSup() {
+    	return "";
+	}
+
+	public String genSupEg() {
+		return "";
+	}
+
+	public String genEg() {
+		return "";
+	}
+
+	public String genNEg() {
+		return "";
+	}
+	
+	public String genPlus() {
+		return "";
+	}
+
+	public String genMoins() {
+		return "";
+	}
+
+	public String genOu() {
+		return "";
+	}
+	
+	public String genMult() {
+		return "";
+	}
+
+	public String genDiv() {
+		return "";
+	}
+
+	public String genMod() {
+		return "";
+	}
+
+	public String genEt() {
+		return "";
+	}
 
 }
