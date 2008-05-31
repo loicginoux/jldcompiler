@@ -32,5 +32,18 @@ public abstract class AbstractMachine {
     public abstract String genPlusInt();
     public abstract String genMoinsInt();
     public abstract String genNegation();
-
+    public abstract String genInf();
+    public abstract String genInfEg();
+    public abstract String genSup();
+	public abstract String genSupEg();
+	public abstract String genEg();
+	public abstract String genNEg();
+	public abstract String genPlus();
+	public abstract String genMoins();
+	public abstract String genOu();
+	public abstract String genMult();
+	public abstract String genDiv();
+	public abstract String genMod();
+	public abstract String genEt();
+	
 }

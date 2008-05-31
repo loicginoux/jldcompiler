@@ -104,6 +104,58 @@ public class TAM extends AbstractMachine {
     public String genNegation() {
 		return "\tSUBR BNeg\n";
 	}
+    
+    public String genInf() {
+		return "\tSUBR ILss\n";
+	}
+    
+    public String genInfEg() {
+		return "\tSUBR ILeq\n";
+	}
+    
+    public String genSup() {
+		return "\tSUBR IGtr\n";
+	}
+
+	public String genSupEg() {
+		return "\tSUBR IGeg\n";
+	}
+
+	public String genEg() {
+		return "\tSUBR Ieq\n";
+	}
+
+	public String genNEg() {
+		return "\tSUBR Ieq\n";
+	}
+	
+	public String genPlus() {
+		return "\tSUBR IAdd\n";
+	}
+
+	public String genMoins() {
+		return "\tSUBR ISub\n";
+	}
+
+	public String genOu() {
+		return "\tSUBR BOr\n";
+	}
+	
+	public String genMult() {
+		return "\tSUBR IMul\n";
+	}
+
+	public String genDiv() {
+		return "\tSUBR IDiv\n";
+	}
+
+	public String genMod() {
+		return "\tSUBR IMod\n";
+	}
+
+	public String genEt() {
+		return "\tSUBR BAnd\n";
+	}
 	
 	// compteur pour le generateur d'etiquettes
     private static int cpt = 0;

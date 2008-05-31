@@ -23,9 +23,11 @@ inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
 
 syn nom : String for TYPE;
 
-syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN;
+syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
+                        OPREL, OPADD, OPMUL;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
-                                    ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN;
+                                    ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
+                                    OPREL, OPADD, OPMUL;
 inh nomMethode : String for INST, INSTS, BLOC, SIX;
 -- les terminaux 
 
@@ -634,26 +636,104 @@ ER ->   ES ERX ;
 ES ->  T ESX ;
 ERX ->  OPREL ES ;
 ERX -> ;
-OPREL -> inf ;
-OPREL -> infeg ;
-OPREL -> sup ;
-OPREL -> supeg ;
-OPREL -> eg ;
-OPREL -> neg ;
+OPREL -> inf #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genInf();
+        end
+    }
+
+OPREL -> infeg #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genInfEg();
+        end
+    }
+
+OPREL -> sup #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genSup();
+        end
+    }
+
+OPREL -> supeg #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genSupEg();
+        end
+    }
+
+OPREL -> eg #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genEg();
+        end
+    }
+
+OPREL -> neg #code ;
+    #code {
+        do
+          OPREL^code := OPREL^machine.genNEg();
+        end
+    }
+
 -- addition, ...
 ESX ->   OPADD T ESX ;
 ESX ->;
-OPADD -> plus ;
-OPADD -> moins ;
-OPADD -> ou ;
+OPADD -> plus #code ;
+    #code {
+        do
+          OPADD^code := OPADD^machine.genPlus();
+        end
+    }
+
+OPADD -> moins #code ;
+    #code {
+        do
+          OPADD^code := OPADD^machine.genMoins();
+        end
+    }
+
+OPADD -> ou #code ;
+    #code {
+        do
+          OPADD^code := OPADD^machine.genOu();
+        end
+    }
+
 T ->  F TX ;
 -- multiplication, ...
 TX ->   OPMUL F TX ;
 TX -> ;
-OPMUL -> mult ;
-OPMUL -> div ;
-OPMUL -> mod ;
-OPMUL -> et ;
+OPMUL -> mult #code ;
+    #code {
+        do
+          OPMUL^code := OPMUL^machine.genMult();
+        end
+    }
+
+OPMUL -> div #code ;
+    #code {
+        do
+          OPMUL^code := OPMUL^machine.genDiv();
+        end
+    }
+
+OPMUL -> mod #code ;
+    #code {
+        do
+          OPMUL^code := OPMUL^machine.genMod();
+        end
+    }
+
+OPMUL -> et #code ;
+    #code {
+        do
+          OPMUL^code := OPMUL^machine.genEt();
+        end
+    }
+
 
 -- expressions de base
 F -> entier #code ;
