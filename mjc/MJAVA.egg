@@ -24,7 +24,7 @@ inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
 syn nom : String for TYPE;
 
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
-                        OPREL, OPADD, OPMUL;
+                        OPREL, OPADD, OPMUL, ESX;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
@@ -85,9 +85,9 @@ term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     global
        machine : AbstractMachine;
-       tds:TDS;
-       tdt:TDT;
-       tdm:TDM;
+       tds : TDS;
+       tdt : TDT;
+       tdm : TDM;
        langage : String;
     #init {
         local
@@ -121,8 +121,8 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     #gen {
         do
           write ";TDS : " + tds;
-          write "\n\n;TDT : "+tdt+"\n";
-          write "\n\n;TDM : "+tdm+"\n";
+          write "\n\n;TDT : " + tdt + "\n";
+          write "\n\n;TDM : " + tdm + "\n";
           call machine.writeCode(PROGRAMME^source.getFileName(), IMPORTS^code + DEFCLASSE^code);
           write "fin gen\n";
         end
@@ -155,19 +155,19 @@ IMPORTS -> #tdts #code;
 IMPORTS -> import ident pv IMPORTS #tdts #code;
 	#tdts {
 		local 
-		    fac:Factory;
-		    tdt:TDT;
-		    tdts:List<TDT>;
+		    fac : Factory;
+		    tdt : TDT;
+		    tdts : List<TDT>;
 		do
 		    fac := new Factory();
 		    tdt := fac.chargerTDT(ident^txt);
-		    if tdt=nil then
-		        error(B_02,ident^txt);
+		    if tdt = nil then
+		        error(B_02, ident^txt);
 		    end   
-		    write "\ntdtimport:"+tdt+"\n"; 
+		    write "\ntdtimport:" + tdt + "\n"; 
 		    tdts := IMPORTS1^tdts;
-		    if tdts.contains(tdt) & tdt/=nil then
-		        warning(B_01,ident^txt);
+		    if tdts.contains(tdt) & tdt /= nil then
+		        warning(B_01, ident^txt);
 		        IMPORTS^tdts := tdts;
 		    else
 		        call tdts.add(tdt);
@@ -177,8 +177,8 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 	}
 	#code {
 		local 
-		    fac:Factory;
-		    importCode:String;
+		    fac : Factory;
+		    importCode : String;
 		do
 		    fac := new Factory();
 		    importCode := fac.chargerCode(ident^txt + "_code");
@@ -190,13 +190,13 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
 	#tdt {
 		local 
-		    type:Type;
+		    type : Type;
 		do
 		    type := DEFCLASSE^tdt.chercherLocalement(ident^txt);
 		    if type = nil then
 		        call DEFCLASSE^tdt.setClassname(ident^txt);
 		    else
-		        error(B_03,ident^txt); --redefinition d'une classe importe
+		        error(B_03, ident^txt); --redefinition d'une classe importe
 		    end      
 		    EXTENSION^tdt := DEFCLASSE^tdt; --auto par egg
 		end
@@ -213,31 +213,31 @@ DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
 	}
     
 -- heritage
-EXTENSION -> etend ident #tdt #tds #tdm ;
+EXTENSION -> etend ident #tdt #tds #tdm ; -- le code est deja insere dans les imports
 	#tdt {
 		local
-		    type:Type;
-		    monType:Type;
+		    type : Type;
+		    monType : Type;
 		do
-		    type:=EXTENSION^tdt.chercherLocalement(ident^txt);
-		    if type/=nil then
+		    type := EXTENSION^tdt.chercherLocalement(ident^txt);
+		    if type /= nil then
 		        monType := EXTENSION^tdt.getMonType();
 		        call monType.setClassExtends(ident^txt);
 		        call monType.setTaille(1); --taille du pointeur super
 		    else
-		        error(B_04,ident^txt);
+		        error(B_04, ident^txt);
 		    end
 		end
 	}
 	#tds {
 		local
-		    fac:Factory;
-		    i:INFO;
+		    fac : Factory;
+		    i : INFO;
 		do
 		    fac := new Factory();
-		    call  EXTENSION^tds.setParente(fac.chargerTDS(ident^txt));
+		    call EXTENSION^tds.setParente(fac.chargerTDS(ident^txt));
 		    i := new INFO();
-		    call i.setDep(0); -- plus tard
+		    call i.setDep(0); -- TODO plus tard
 		    call i.setStatique(false);
 		    call i.setVisibility(1); -- le super est private
 		    call i.setType(ident^txt);
@@ -246,7 +246,7 @@ EXTENSION -> etend ident #tdt #tds #tdm ;
 	}
 	#tdm {
 		local
-		    fac:Factory;
+		    fac : Factory;
 		do
 		    fac := new Factory();
 		    call  EXTENSION^tdm.setParente(fac.chargerTDM(ident^txt));
@@ -289,7 +289,7 @@ DEFQUAL -> public DEFQUAL #visibility;
             if DEFQUAL1^visibility.getGauche() = -1 then
                 DEFQUAL^visibility := new COUPLE(0, DEFQUAL1^visibility.getDroite());
             else
-                error(B_00,"public");
+                error(B_00, "public");
             end
         end
     }
@@ -300,7 +300,7 @@ DEFQUAL -> prive DEFQUAL #visibility;
             if DEFQUAL1^visibility.getGauche() = -1 then
                 DEFQUAL^visibility := new COUPLE(1, DEFQUAL1^visibility.getDroite());
             else
-                error(B_00,"private");
+                error(B_00, "private");
             end
         end
     }
@@ -311,7 +311,7 @@ DEFQUAL -> protect DEFQUAL #visibility;
             if DEFQUAL1^visibility.getGauche() = -1 then
                 DEFQUAL^visibility := new COUPLE(2, DEFQUAL1^visibility.getDroite());
             else
-                error(B_00,"protected");
+                error(B_00, "protected");
             end
         end
     }
@@ -322,7 +322,7 @@ DEFQUAL -> static DEFQUAL #visibility;
             if !DEFQUAL1^visibility.getDroite() then
                 DEFQUAL^visibility := new COUPLE(DEFQUAL1^visibility.getGauche(), true);
             else
-                error(B_00,"static");
+                error(B_00, "static");
             end
         end
     }
@@ -331,10 +331,10 @@ DEFQUAL -> static DEFQUAL #visibility;
 DEF ->  TYPE ident pv #tdt #tds #code ;
 	#tdt {
 		local 
-		    type:Type;
+		    type : Type;
 		do
 		   type := DEF^tdt.chercherLocalement(TYPE^nom);
-		   if type=nil then
+		   if type = nil then
 		        error(B_04,TYPE^nom);
 		   else
 		        type := DEF^tdt.getMonType();
@@ -345,18 +345,18 @@ DEF ->  TYPE ident pv #tdt #tds #code ;
 	}
 	#tds {
 		local
-		    i:INFO;
+		    i : INFO;
 		do
 		    i := DEF^tds.chercherLocalement(ident^txt);
-		    if i=nil then
+		    if i = nil then
 		        i := new INFO();
-		        call i.setDep(0); -- plus tard
+		        call i.setDep(0); -- TODO : plus tard
 		        call i.setStatique(DEF^visibilitySyn.getDroite());
 		        call i.setVisibility(DEF^visibilitySyn.getGauche());
 		        call i.setType(TYPE^nom);
-		        call DEF^tds.inserer(ident^txt,i);
+		        call DEF^tds.inserer(ident^txt, i);
 		    else
-		        error(B_05,ident^txt);
+		        error(B_05, ident^txt);
 		    end
 		end
 	}
@@ -382,16 +382,16 @@ DEF ->  TYPE ident paro PARFS parf #tdt #tdm BLOC #code ;
 	}
 	#tdm {
 		local
-		    s:Signature;
-		    stemp:Signature;
+		    s : Signature;
+		    stemp : Signature;
 		do
 		    s := new Signature();
 		    call s.ajouter(PARFS^params);
 		    call s.setStatique(DEF^visibilitySyn.getDroite());
 		    call s.setVisibility(DEF^visibilitySyn.getGauche());
 		    call s.setRetour(TYPE^nom);
-		     if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
-		        error(B_06,ident^txt,s.toString());
+		    if (DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then
+		        error(B_06, ident^txt, s.toString());
 		    else
 		    end
 		    call DEF^tdm.inserer(ident^txt + "_" + s.getStringParams(), s);
@@ -408,25 +408,26 @@ DEF ->  TYPE ident paro PARFS parf #tdt #tdm BLOC #code ;
 DEF -> void ident  paro PARFS parf #tdm  BLOC #code ;
 	#tdm {
 		local
-		    s:Signature;
-		    stemp:Signature; 
+		    s : Signature;
+		    stemp : Signature; 
 		do
 		    s := new Signature();
 		    call s.ajouter(PARFS^params);
 		    call s.setStatique(DEF^visibilitySyn.getDroite());
 		    call s.setVisibility(DEF^visibilitySyn.getGauche());
 		    call s.setRetour(nil);
-		    if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
-		        error(B_06,ident^txt,s.toString());
+		    if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then
+		        error(B_06, ident^txt, s.toString());
 		    else
 		    end
-		    call DEF^tdm.inserer(ident^txt+"_"+s.getStringParams(),s);
+		    call DEF^tdm.inserer(ident^txt + "_" + s.getStringParams(), s);
 		    BLOC^nomMethode := ident^txt + "_" + s.getStringParams();
 		end
 	}
 	#code {
 		do
 		    DEF^code := BLOC^code;
+            -- TODO  : return. quelle taille ?
 		end
 	}
 
@@ -434,8 +435,8 @@ DEF -> void ident  paro PARFS parf #tdm  BLOC #code ;
 DEF -> ident  paro PARFS parf #tdm BLOC #code ; 
 	#tdm {
 		local
-		    s:Signature;
-		    stemp:Signature; 
+		    s : Signature;
+		    stemp : Signature; 
 		do
 		    s := new Signature();
 		    call s.ajouter(PARFS^params);
@@ -443,8 +444,8 @@ DEF -> ident  paro PARFS parf #tdm BLOC #code ;
 		    call s.setVisibility(DEF^visibilitySyn.getGauche());
 		    call s.setRetour(DEF^tdt.getClassname());
 		    
-		    if(DEF^tdm.containsKey(ident^txt+"_"+s.getStringParams())) then
-		        error(B_06,ident^txt,s.toString());
+		    if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then
+		        error(B_06, ident^txt, s.toString());
 		    else
 		    end
 		    call DEF^tdm.inserer(ident^txt + "_" + s.getStringParams(), s);
@@ -679,8 +680,20 @@ OPREL -> neg #code ;
     }
 
 -- addition, ...
-ESX ->   OPADD T ESX ;
-ESX ->;
+ESX ->   OPADD T ESX #code ;
+    #code {
+        do
+          ESX^code := ""; -- ESX^machine.gen(); -- TODO
+        end
+    }
+
+ESX -> #code ;
+    #code {
+        do
+          ESX^code := "";
+        end
+    }
+
 OPADD -> plus #code ;
     #code {
         do
