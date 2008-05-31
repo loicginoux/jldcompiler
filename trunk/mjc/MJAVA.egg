@@ -610,7 +610,7 @@ INST ->  tantque paro E parf BLOC #code ;
 E ->  ER AFFX #code ;
 	#code {
 		do
-		    E^code := E^machine.genExpression(); -- TODO
+		    E^code := ""; -- E^machine.genExpression(); -- TODO
 		end
 	}
 
@@ -618,7 +618,7 @@ E ->  ER AFFX #code ;
 AFFX ->  affect ER #code ;
 	#code {
 		do
-		    AFFX^code := AFFX^machine.genValeur(); -- TODO
+		    AFFX^code := ""; -- AFFX^machine.genValeur(); -- TODO
 		end
 	}
 

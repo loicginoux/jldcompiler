@@ -25,5 +25,12 @@ public abstract class AbstractMachine {
 	public abstract String genCond(String codeBloc1, String codeBloc2);
 	public abstract String genWhile(String condition, String bloc);
 	public abstract String genReturn(String nomMethode, TDM tdm);
+	public abstract String genTrue();
+    public abstract String genFalse();
+    public abstract String genNull();
+    public abstract String genInt(String i);
+    public abstract String genPlusInt();
+    public abstract String genMoinsInt();
+    public abstract String genNegation();
 
 }
