@@ -13,6 +13,8 @@ import mjc.tds.TDS;
 import mjc.tdt.TDT;
 
 public class Factory {
+	
+	private static String langage;
 
 	public static void persister(Serializable t,String filename){
 		try{
@@ -24,6 +26,23 @@ public class Factory {
 			fos.close();
 		}catch(Exception e){
 			throw new RuntimeException("Impossible de persister la TDT : "+e);
+		}
+	}
+	
+	public static String chargerCode(String className) {
+		String filename = className + "." + langage;
+		ObjectInputStream ois = null;
+		try {
+			FileInputStream fis = new FileInputStream(new File(filename));
+			ois = new ObjectInputStream(fis);
+			String ret = (String) ois.readObject();
+			ois.close();
+			fis.close();
+			return ret;
+		} catch (FileNotFoundException e) {
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException("Impossible de charger la TDT : "+e);
 		}
 	}
 	
@@ -79,6 +98,10 @@ public class Factory {
 	
 	public static boolean isNull(Object o){
 		return o==null;
+	}
+	
+	public static void setLangage(String l) {
+		langage = l;
 	}
 
 }
