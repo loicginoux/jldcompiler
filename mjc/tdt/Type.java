@@ -34,5 +34,6 @@ public class Type implements Serializable{
 	public String toString(){
 		return " ("+taille+","+classExtends+")";
 	}
+	
 
 }
