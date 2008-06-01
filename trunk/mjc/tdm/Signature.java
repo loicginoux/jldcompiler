@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import mjc.tds.TDS;
+
 
 public class Signature implements Serializable {
 	
@@ -16,6 +18,7 @@ public class Signature implements Serializable {
 	private boolean statique;
 	List<String> params;
 	String retour;
+	
 	
 	public Signature (){
 		params = new Vector<String>();
@@ -115,5 +118,6 @@ public class Signature implements Serializable {
 		}
 		return res;
 	}
+
 
 }

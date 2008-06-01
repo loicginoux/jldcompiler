@@ -106,5 +106,25 @@ public class TDT extends HashMap<String, Type> implements Serializable{
 		remove(this.classname);
 		put(classname,new Type());
 	}
+	
+	/**
+	 * Dit si 2 type sont compatible. Les 2 type2 doivent appartenir a la tdt globale
+	 * @param type1 type a gauche de legalite
+	 * @param type2 type a droite de legalite
+	 * @return
+	 */
+	public boolean sontEgalable(String type1,String type2){
+		if (type2==null) return true;
+		else
+			if(type1.equals(type2)) return true;
+			else{
+				Type t = chercherGlobalement(type2);
+				if (t==null) return false; //impossible mais bon
+				else{
+					if (t.getClassExtends()==null) return false;
+					else return sontEgalable(type1,t.getClassExtends());
+				}
+			}
+	}
 
 }

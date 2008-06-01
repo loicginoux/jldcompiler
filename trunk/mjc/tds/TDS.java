@@ -46,10 +46,12 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 		
 		}
 		
+		/*
 		if(parente != null){
 		sb.append("parent : ");
 		sb.append(parente.toString());
 		}
+		*/
 		
 		return sb.toString();
 	}
