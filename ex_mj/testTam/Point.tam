@@ -1,0 +1,32 @@
+	JUMP Point_main
+
+Point_getx_
+	;this dans la pile
+	LOADL 0 ;dep de x
+	SUBR Iadd ;avoir x
+	LOADI (1) ; toujours 1 int bool ou @
+	RETURN (1) 1 ;1 car fo virer le this
+	
+Point_setx_int
+	;pile : y;this
+	LOAD (1) 0 [LB] ;charger y
+	LOAD (1) 1 [LB] ; charger this
+	LOADL 0
+	SUBR Iadd ;obtenir l'@ de x
+	STOREI (1) ;x<-y
+	return (0) 2;
+	
+	
+	
+	
+Point_Point_intint
+	;on a en pile @;b;a
+	
+	
+Point_main
+	PUSH 1 ; place pour p
+	loadl 1 ; taille de point
+	subr MAlloc
+	call Point_setx_int
+	halt
+	

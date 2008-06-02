@@ -9,13 +9,18 @@ option k=3;
 -- les attributs semantiques ----------------------------------------------------------------------
 inh source : MJAVASourceFile for PROGRAMME;
 
-inh tds : TDS for  DEFCLASSE, EXTENSION, DEFS, DEF,BLOC,INSTS,INST,SIX,PARFSX, PARFS, PARF;
+inh tds : TDS for  DEFCLASSE, EXTENSION, DEFS, DEF,BLOC,INSTS,INST,SIX,PARFSX, PARFS, PARF,E,ER,AFFX
+,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX;
 
-inh tdm : TDM for DEFCLASSE, EXTENSION, DEFS, DEF, INST, INSTS, BLOC,SIX;
+inh tdm : TDM for DEFCLASSE, EXTENSION, DEFS, DEF, INST, INSTS, BLOC,SIX,PARFSX, PARFS, PARF,E,ER,AFFX
+,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX;
+
 syn params : List<String> for PARFS, PARFSX;
 syn param : String for PARF;
 
-inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF, INSTS, INST, BLOC, SIX;
+inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF,E,ER,AFFX
+,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX,INSTS, INST, BLOC, SIX;
+
 syn tdts : List<TDT> for IMPORTS;
 
 syn visibility : COUPLE<Integer,Boolean> for DEFQUAL;
@@ -23,8 +28,13 @@ inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
 
 syn nom : String for TYPE;
 
+inh ismethode : boolean for Q;
+inh tdscourante : TDS for Q;
+inh tdmcourante : TDM for Q;
+
+
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
-                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX, Q, ARGS, ARGSX;
+                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
@@ -764,21 +774,21 @@ AFFX -> #code ;
 ER ->   ES ERX #code ;
     #code {
         do
-          ER^code := ER^machine.genExprValeur(ES^code, ERX^code); -- XXX
+          ER^code := "";--ER^machine.genExprValeur(ES^code, ERX^code); -- XXX
         end
     }
 
 ES ->  T ESX #code ;
     #code {
         do
-            ES^code := ES^machine.genExprValeur(T^code, ESX^code); -- XXX
+            ES^code := "";--ES^machine.genExprValeur(T^code, ESX^code); -- XXX
         end
     }
 
 ERX ->  OPREL ES #code ;
     #code {
         do
-            ERX^code := ERX^machine.genExprValeur(ES^code, OPREL^code); -- XXX
+            ERX^code := "";--ERX^machine.genExprValeur(ES^code, OPREL^code); -- XXX
         end
     }
 
@@ -835,7 +845,7 @@ OPREL -> neg #code ;
 ESX ->   OPADD T ESX #code ;
     #code {
         do
-          ESX^code := ESX^machine.genExprValeur(T^code, OPADD^code) + ESX1^code; -- XXX si T est une valeur ? ne pas faire le LOADI ?
+          ESX^code := "";--ESX^machine.genExprValeur(T^code, OPADD^code) + ESX1^code; -- XXX si T est une valeur ? ne pas faire le LOADI ?
         end
     }
 
@@ -870,7 +880,7 @@ OPADD -> ou #code ;
 T ->  F TX #code ;
     #code {
         do
-          T^code := T^machine.genExprValeur(F^code, TX^code); -- XXX
+          T^code := "";--T^machine.genExprValeur(F^code, TX^code); -- XXX
         end
     }
 
@@ -878,7 +888,7 @@ T ->  F TX #code ;
 TX ->   OPMUL F TX #code ;
     #code {
         do
-          TX^code := TX^machine.genExprValeur(F^code, OPMUL^code) + TX1^code; -- XXX
+          TX^code := "";--TX^machine.genExprValeur(F^code, OPMUL^code) + TX1^code; -- XXX
         end
     }
 
@@ -944,7 +954,7 @@ F -> faux #code ;
 F ->  OPUN F #code ;
     #code {
         do
-          F^code := F^machine.genExprValeur(F1^code, OPUN^code); -- XXX
+          F^code := "";-- F^machine.genExprValeur(F1^code, OPUN^code); -- XXX
         end
     }
     
@@ -992,80 +1002,285 @@ F -> nouveau  TYPE paro ARGS parf #code ;
         end
     }
     
--- this -------------------------------------------------------------------------------------------
-F -> this Q #code ;
+-- this 
+F -> this #ismethode #tdsmcourante Q #code ;
+    #ismethode {
+    do
+        Q^ismethode := false;
+    end
+    }
+    
+    #tdsmcourante {
+    local
+        classname : String;
+    do
+        classname := F^tdm.getClassname();
+        Q^tdscourante := F^tds.getPlusHaute();
+        Q^tdmcourante := F^tdm;
+        
+    end
+    }
+      
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- appel super ------------------------------------------------------------------------------------
-F ->  super Q #code ;
+-- appel super 
+F ->  super  #ismethode #tdsmcourante Q #code ;
+     #ismethode {
+    do
+        Q^ismethode := false;
+    end
+    }
+    
+    #tdsmcourante {
+    local
+        i : INFO;
+        fac : Factory;
+    do
+        fac := new Factory();
+        i := F^tds.chercherGlobalement("super");
+        if i/=nil then
+            Q^tdscourante := fac.chargerTDS(i.getType());
+            Q^tdmcourante := fac.chargerTDM(i.getType());
+        else
+            error(B_10,"super");
+        end  
+    end
+    }
+    
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- acces variable ou methode ----------------------------------------------------------------------
-F ->  ident Q #code ;
+-- acces variable ou methode 
+F ->  ident #ismethode #tdsmcourante Q #code ;
+    global 
+        ismethode : Boolean;
+    #ismethode {
+    local 
+        i:INFO;
+        s:Signature;
+    do
+        i := F^tds.chercherGlobalement(ident^txt);
+        --s := F^tdm.chercherGlobalement(ident^txt); --XXX
+        if i=nil then
+            ismethode := true;
+            Q^ismethode := true; --on va considerer que oui !
+        else
+            ismethode := false;
+            Q^ismethode := false; --on considere s=nil !!
+        end
+    end
+    }
+    
+    #tdsmcourante {
+    local
+        l:List<Signature>;
+        s:Signature;
+        i:INFO;
+        classname : String;
+        maclasse : String;
+        t:Type;
+        fac : Factory;
+    do
+        if ismethode then --si c'est une methode
+            --choper le type de retour de la methode
+            -- on gere pas la surcharge
+            l := F^tdm.chercherGlobalementSansArgs(ident^txt);
+            if (l.isEmpty()) then
+                error(B_10,ident^txt);
+            else
+                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
+                classname := s.getRetour();
+                maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
+                
+                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
+                    Q^tdmcourante := nil;
+                    Q^tdscourante := nil;
+                elseif classname.equals(maclasse) then
+                    Q^tdscourante := F^tds.getPlusHaute();
+                    Q^tdmcourante := F^tdm;
+                else
+                    fac := new Factory();
+                    Q^tdscourante := fac.chargerTDS(classname);
+                    Q^tdmcourante := fac.chargerTDM(classname);
+                end
+            end
+        else
+            i := F^tds.chercherGlobalement(ident^txt);
+            -- c sur c un field
+            classname := i.getType();
+            maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
+            if classname.equals(maclasse) then
+                Q^tdscourante := F^tds.getPlusHaute();
+                Q^tdmcourante := F^tdm;
+            else
+                fac := new Factory();
+                Q^tdscourante := fac.chargerTDS(classname);
+                Q^tdmcourante := fac.chargerTDM(classname);
+            end
+            
+        end
+    end
+    }
+    
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- Q = qualificateur de variable  -----------------------------------------------------------------
-Q ->  #code ;
-    #code {
-        do
-          Q^code := "";
+-- Q = qualificateur de variable
+Q ->  #ismethode ;
+    #ismethode {
+    do
+        if Q^ismethode then
+            error(B_12);
+        else
         end
+    end
+    }
+
+-- acces attribut ou methode
+Q ->  pt ident #ismethode #tdsmcourante Q  ;
+    global 
+        ismethode : Boolean;
+    #ismethode {
+    local 
+        i:INFO;
+        s:Signature;
+    do 
+        --- verifier que Q a une table de symbole courante
+        if Q^tdscourante = nil then
+            error(B_14, ident^txt); 
+        else
+        end
+        
+        --- fin verification
+        
+        i := Q^tdscourante.chercherGlobalement(ident^txt);
+        --s := Q^tdmcourante.chercherGlobalement(ident^txt); --XXX
+        if i=nil then
+            ismethode := true;
+            Q1^ismethode := true; --on va considerer que oui !
+        else
+            ismethode := false;
+            Q1^ismethode := false; --on considere s=nil !!
+        end
+        
+        --verifier quon a pas une methode
+        if Q^ismethode then
+            error(B_12);
+        else
+        end
+    end
     }
     
--- acces attribut ---------------------------------------------------------------------------------
-Q ->  pt ident  Q #code ;
-    #code {
-        do
-          Q^code := Q1^code; -- XXX
+    #tdsmcourante {
+    local
+        l:List<Signature>;
+        s:Signature;
+        i:INFO;
+        classname : String;
+        maclasse : String;
+        t:Type;
+        fac : Factory;
+        acces : Integer;
+        classecourante : String;
+    do
+        if ismethode then
+            --choper le type de retour de la methode
+            -- on gere pas la surcharge
+            l := Q^tdmcourante.chercherGlobalementSansArgs(ident^txt);
+            if (l.isEmpty()) then
+                error(B_10,ident^txt);
+            else
+                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
+                classname := s.getRetour();
+                maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
+                
+                ------ gestion du private-----------
+                acces := s.getVisibility();
+                classecourante := Q^tdmcourante.getClassname();
+                if acces=1 then
+                    if classecourante.equals(maclasse) then
+                    else
+                        error(B_13b,ident^txt);  --champs prive
+                    end
+                else
+                end
+                ------ fin gestion -------------
+                
+                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
+                    Q1^tdmcourante := nil;
+                    Q1^tdscourante := nil;
+                elseif classname.equals(maclasse) then
+                    Q1^tdscourante := Q^tds.getPlusHaute();
+                    Q1^tdmcourante := Q^tdm;
+                else
+                    fac := new Factory();
+                    Q1^tdscourante := fac.chargerTDS(classname);
+                    Q1^tdmcourante := fac.chargerTDM(classname);
+                end
+            end
+        else
+             i := Q^tdscourante.chercherGlobalement(ident^txt);
+            -- c sur c un field
+            classname := i.getType();
+            maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
+            
+            ------ gestion du private-----------
+            acces := i.getVisibility();
+            classecourante := Q^tdmcourante.getClassname();
+            if acces=1 then
+                if classecourante.equals(maclasse) then
+                else
+                    error(B_13,ident^txt);  --champs prive
+                end
+            else
+            end
+            ------ fin gestion -------------
+            
+            if classname.equals(maclasse) then
+                Q1^tdscourante := Q^tds.getPlusHaute();
+                Q1^tdmcourante := Q^tdm;
+            else
+                fac := new Factory();
+                Q1^tdscourante := fac.chargerTDS(classname);
+                Q1^tdmcourante := fac.chargerTDM(classname);
+            end
         end
+    end
+    }
+
+-- arguments d'appel de methode
+Q ->  paro ARGS parf #ismethode #tdsmcourante Q  ;
+    #ismethode {
+    do
+        if Q^ismethode then
+        else
+            error(B_11);
+        end
+        
+        Q1^ismethode := false;
+    end
     }
     
--- arguments d'appel de methode -------------------------------------------------------------------
-Q ->  paro ARGS parf Q #code ;
-    #code {
-        do
-          Q^code := ARGS^code + Q1^code; -- XXX
-        end
+    #tdsmcourante { --XXX gerer la surcharge plus haut PUIS ici
+    do
+        Q1^tdscourante := Q^tdscourante; --auto par egg
+        Q1^tdmcourante := Q^tdmcourante;
+    end
     }
     
-ARGS ->  E ARGSX #code ;
-    #code {
-        do
-          ARGS^code := ARGSX^code + E^code;
-        end
-    }
-    
-ARGS -> #code ;
-    #code {
-        do
-          ARGS^code := "";
-        end
-    }
-    
-ARGSX ->   virg E ARGSX #code ;
-    #code {
-        do
-          ARGSX^code := ARGSX1^code+ E^code;
-        end
-    }
-    
-ARGSX -> #code ;
-    #code {
-        do
-          ARGSX^code := "";
-        end
-    }
-    
+ARGS ->  E ARGSX  ;
+ARGS -> ;
+ARGSX ->   virg E ARGSX  ;
+ARGSX -> ;
+
 end

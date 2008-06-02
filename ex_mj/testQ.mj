@@ -1,0 +1,18 @@
+
+class testQ {
+	
+	private int x;
+	public bool t;
+	
+	private testQ getMoi(){
+		return this;
+	}
+	
+	public testQ getMoibis(){
+		return this.getMoi();
+	}
+	
+	public void getx(){
+	}
+
+}

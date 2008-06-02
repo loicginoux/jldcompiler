@@ -1,0 +1,23 @@
+class Point {
+
+	private int x;
+	
+	public int getx(){
+		return this.x;
+	}
+	
+	public void setx(int y){
+		x=y;
+	}
+	
+	public Point(int a){
+		setx(a);
+	}
+	
+	public void main(){
+		Point p = new Point(24);
+		p.setx(2);
+		p.setx(2+p.getx());
+	}
+	
+}
