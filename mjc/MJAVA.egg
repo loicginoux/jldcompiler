@@ -15,7 +15,7 @@ inh tdm : TDM for DEFCLASSE, EXTENSION, DEFS, DEF, INST, INSTS, BLOC,SIX;
 syn params : List<String> for PARFS, PARFSX;
 syn param : String for PARF;
 
-inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF,INSTS,INST,BLOC,SIX;
+inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF, INSTS, INST, BLOC, SIX;
 syn tdts : List<TDT> for IMPORTS;
 
 syn visibility : COUPLE<Integer,Boolean> for DEFQUAL;
@@ -127,7 +127,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
           write "fin gen\n";
         end
     }
-    #sauv{
+    #sauv {
 	    local
 	        fac:Factory;
 	    do
@@ -201,7 +201,7 @@ DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
 		    EXTENSION^tdt := DEFCLASSE^tdt; --auto par egg
 		end
 	}
-	#tdm{
+	#tdm {
 		do
 		    call DEFCLASSE^tdm.setClassname(ident^txt);
 		end
@@ -373,17 +373,17 @@ DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
     global
         tds:TDS;
 	#tds {
-    local 
-        i:INFO;
-    do
-        tds := new TDS(DEF^tds);
-        PARFS^tds := tds;
-        i := new INFO();
-        call i.setType(DEF^tdt.getClassname());
-        call tds.inserer("this",i); --ajout du this 
-        
-        BLOC^tds := tds; --auto par egg
-    end
+	    local 
+	        i:INFO;
+	    do
+	        tds := new TDS(DEF^tds);
+	        PARFS^tds := tds;
+	        i := new INFO();
+	        call i.setType(DEF^tdt.getClassname());
+	        call tds.inserer("this",i); --ajout du this 
+	        
+	        BLOC^tds := tds; --auto par egg
+	    end
     }
     #tdt {
 		local
@@ -419,11 +419,10 @@ DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
 		    DEF^code := BLOC^code;
 		end
 	}
-    
-    #debug{
-    do
-        write("tds de "+ident^txt+" : "+tds);
-    end
+    #debug {
+	    do
+	        write("tds de "+ident^txt+" : "+tds);
+	    end
     }
 
 -- methode (procedure)
@@ -431,17 +430,17 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
     global
         tds:TDS;
     #tds {
-    local 
-        i:INFO;
-    do
-        tds := new TDS(DEF^tds);
-        PARFS^tds := tds;
-        i := new INFO();
-        call i.setType(DEF^tdt.getClassname());
-        call tds.inserer("this",i); --ajout du this 
-        
-        BLOC^tds := tds; --auto par egg
-    end
+	    local 
+	        i:INFO;
+	    do
+	        tds := new TDS(DEF^tds);
+	        PARFS^tds := tds;
+	        i := new INFO();
+	        call i.setType(DEF^tdt.getClassname());
+	        call tds.inserer("this",i); --ajout du this 
+	        
+	        BLOC^tds := tds; --auto par egg
+	    end
     }
 	#tdm {
 		local
@@ -468,11 +467,10 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
             -- TODO  : return. quelle taille ?
 		end
 	}
-    
-    #debug{
-    do
-        write("tds de "+ident^txt+" : "+tds);
-    end
+    #debug {
+	    do
+	        write("tds de "+ident^txt+" : "+tds);
+	    end
     }
 
 -- constructeur
@@ -480,17 +478,17 @@ DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ;
     global
         tds:TDS;
     #tds {
-    local 
-        i:INFO;
-    do
-        tds := new TDS(DEF^tds);
-        PARFS^tds := tds;
-        i := new INFO();
-        call i.setType(DEF^tdt.getClassname());
-        call tds.inserer("this",i); --ajout du this 
-        
-        BLOC^tds := tds; --auto par egg
-    end
+	    local 
+	        i:INFO;
+	    do
+	        tds := new TDS(DEF^tds);
+	        PARFS^tds := tds;
+	        i := new INFO();
+	        call i.setType(DEF^tdt.getClassname());
+	        call tds.inserer("this",i); --ajout du this 
+	        
+	        BLOC^tds := tds; --auto par egg
+	    end
     }
 	#tdm {
 		local
@@ -517,10 +515,10 @@ DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ;
 		end
 	}
     
-    #debug{
-    do
-        write("tds de "+ident^txt+" : "+tds);
-    end
+    #debug {
+	    do
+	        write("tds de "+ident^txt+" : "+tds);
+	    end
     }
 
 -- classe interne
@@ -588,20 +586,19 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 		    PARF^param := TYPE^nom;
 		end
 	}
-    
     #tds {
-    local 
-        i:INFO;
-    do
-        i := PARF^tds.chercherLocalement(ident^txt);
-        if i/=nil then
-            error(B_07,ident^txt);
-        else
-            i := new INFO();
-            call i.setType(TYPE^nom);
-            call PARF^tds.inserer(ident^txt,i);
-        end
-    end
+	    local 
+	        i:INFO;
+	    do
+	        i := PARF^tds.chercherLocalement(ident^txt);
+	        if i/=nil then
+	            error(B_07,ident^txt);
+	        else
+	            i := new INFO();
+	            call i.setType(TYPE^nom);
+	            call PARF^tds.inserer(ident^txt,i);
+	        end
+	    end
     }
 
 -- corps de methode et bloc d'instructions
@@ -646,19 +643,19 @@ INST->  TYPE #tdt ident AFFX #tds pv #code ;
 	}
     
     #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
-    local 
-        i:INFO;
-    do
-        
-        i := INST^tds.chercherLocalement(ident^txt);
-        if i/=nil then
-            error(B_08,ident^txt);
-        else
-            i := new INFO();
-            call i.setType(TYPE^nom);
-            call INST^tds.inserer(ident^txt,i);
-        end
-    end
+	    local 
+	        i:INFO;
+	    do
+	        
+	        i := INST^tds.chercherLocalement(ident^txt);
+	        if i /= nil then
+	            error(B_08, ident^txt);
+	        else
+	            i := new INFO();
+	            call i.setType(TYPE^nom);
+	            call INST^tds.inserer(ident^txt, i);
+	        end
+	    end
     }
 
 -- instruction expression
@@ -672,9 +669,9 @@ INST ->  E pv #code ;
 -- bloc d'instructions
 INST -> #tds BLOC #code ;
     #tds {
-    do
-        BLOC^tds := new TDS(INST^tds);
-    end
+	    do
+	        BLOC^tds := new TDS(INST^tds);
+	    end
     }
 	#code {
 		do
@@ -685,10 +682,10 @@ INST -> #tds BLOC #code ;
 -- conditionnelle
 INST ->  si paro E parf #tds BLOC SIX #code ;
     #tds {
-    do
-        BLOC^tds := new TDS(INST^tds);
-        SIX^tds := INST^tds ; --auto par egg
-    end
+	    do
+	        BLOC^tds := new TDS(INST^tds);
+	        SIX^tds := INST^tds ; --auto par egg
+	    end
     }
 	#code {
 		do
@@ -699,9 +696,9 @@ INST ->  si paro E parf #tds BLOC SIX #code ;
 
 SIX ->   sinon #tds BLOC #code ;
     #tds {
-    do
-        BLOC^tds := new TDS(SIX^tds);
-    end
+	    do
+	        BLOC^tds := new TDS(SIX^tds);
+	    end
     }
 	#code {
 		do
@@ -727,9 +724,9 @@ INST ->  retour E pv #code ;
 -- tant que
 INST ->  tantque paro E parf #tds BLOC #code ;
     #tds {
-    do
-        BLOC^tds := new TDS(INST^tds);
-    end
+	    do
+	        BLOC^tds := new TDS(INST^tds);
+	    end
     }
 	#code {
 		do
@@ -754,10 +751,9 @@ AFFX ->  affect ER #code ;
 	}
 
 AFFX -> #code ;
- 
 	#code {
 		do
-		    AFFX^code := "AFFX";
+		    AFFX^code := "";
 		end
 	}
 
