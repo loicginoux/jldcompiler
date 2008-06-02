@@ -1028,7 +1028,7 @@ Q ->  #code ;
 Q ->  pt ident  Q #code ;
     #code {
         do
-          Q^code := ""; -- TODO
+          Q^code := Q1^code; -- XXX
         end
     }
     
@@ -1036,14 +1036,14 @@ Q ->  pt ident  Q #code ;
 Q ->  paro ARGS parf Q #code ;
     #code {
         do
-          Q^code := ""; -- TODO
+          Q^code := Q1^code; -- XXX
         end
     }
     
 ARGS ->  E ARGSX #code ;
     #code {
         do
-          ARGS^code := ""; -- TODO
+          ARGS^code := ARGSX^code + E^code;
         end
     }
     
@@ -1057,7 +1057,7 @@ ARGS -> #code ;
 ARGSX ->   virg E ARGSX #code ;
     #code {
         do
-          ARGSX^code := ""; -- TODO
+          ARGSX^code := ARGSX1^code+ E^code;
         end
     }
     
@@ -1068,5 +1068,4 @@ ARGSX -> #code ;
         end
     }
     
-
 end
