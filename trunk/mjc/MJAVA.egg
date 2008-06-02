@@ -1036,7 +1036,7 @@ Q ->  pt ident  Q #code ;
 Q ->  paro ARGS parf Q #code ;
     #code {
         do
-          Q^code := Q1^code; -- XXX
+          Q^code := ARGS^code + Q1^code; -- XXX
         end
     }
     
