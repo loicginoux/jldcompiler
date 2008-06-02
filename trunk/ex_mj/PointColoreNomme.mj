@@ -1,0 +1,9 @@
+import PointCol;
+
+class PointColoreNomme extends PointCol {
+ 	
+ 	private int nom;
+ 	
+  
+  }
+

@@ -59,6 +59,13 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	public TDS getParente() {
 		return parente;
 	}
+	
+	public TDS getPlusHaute(){
+		if (parente==null)
+			return this;
+		else
+			return parente.getPlusHaute();
+	}
 
 	public void setParente(TDS parente) {
 		this.parente = parente;

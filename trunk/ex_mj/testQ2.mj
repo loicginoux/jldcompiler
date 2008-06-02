@@ -1,0 +1,12 @@
+import testQ;
+
+class testQ2 {
+	
+	public void main() {
+		testQ tq = new testQ();
+		tq.getMoi().getx();
+		
+		
+	}
+
+}

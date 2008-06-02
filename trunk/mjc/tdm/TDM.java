@@ -2,8 +2,10 @@ package mjc.tdm;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 public class TDM extends HashMap<String, Signature> implements Serializable {
 
@@ -21,10 +23,33 @@ public class TDM extends HashMap<String, Signature> implements Serializable {
 			super();
 			parente = p;
 		}
+		
+		public List<Signature> chercherLocalementSansArgs(String n){
+			List<Signature> l = new Vector<Signature>();
+			
+			Set<String> keys = this.keySet();
+			for(String key:keys){
+				String compare = key.split("_")[0];
+				if (compare.equals(n))
+					l.add(this.get(key));
+					
+			}
+			
+			return l;
+		}
+		
+		public List<Signature> chercherGlobalementSansArgs(String n){
+			List<Signature> i = chercherLocalementSansArgs(n);
+			if (i.isEmpty())
+				if (parente != null)
+					return parente.chercherGlobalementSansArgs(n);
+			return i;
+		}
 
 		public Signature chercherLocalement(String n) {
 			return get(n);
 		}
+		
 
 		public Signature chercherGlobalement(String n) {
 			Signature i = chercherLocalement(n);
