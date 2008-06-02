@@ -6,7 +6,7 @@ option auto= true;
 option version = 0.0.1 ;
 option k=3;
 
--- les attributs semantiques
+-- les attributs semantiques ----------------------------------------------------------------------
 inh source : MJAVASourceFile for PROGRAMME;
 
 inh tds : TDS for  DEFCLASSE, EXTENSION, DEFS, DEF,BLOC,INSTS,INST,SIX,PARFSX, PARFS, PARF;
@@ -24,12 +24,13 @@ inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
 syn nom : String for TYPE;
 
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
-                        OPREL, OPADD, OPMUL, ESX;
+                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
 inh nomMethode : String for INST, INSTS, BLOC, SIX;
--- les terminaux 
+
+-- les terminaux ----------------------------------------------------------------------------------
 
 space separateur is  "[\r\n\t ]+";
 space comm is  "\/\/[^\n]*\n";
@@ -81,7 +82,7 @@ term entier is  "[0-9]+";
 term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
 
----------- REGLES DE PRODUCTION ----------------------------------------
+---------- REGLES DE PRODUCTION -------------------------------------------------------------------
 PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     global
        machine : AbstractMachine;
@@ -186,7 +187,7 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 		end
 	}
 
--- definition d'une classe
+-- definition d'une classe ------------------------------------------------------------------------
 DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
 	#tdt {
 		local 
@@ -255,7 +256,7 @@ EXTENSION -> etend ident #tdt #tds #tdm ; -- le code est deja insere dans les im
 
 EXTENSION -> ;
 
--- les attributs
+-- les attributs ----------------------------------------------------------------------------------
 DEFS ->  #code ;
 	#code {
 		do
@@ -275,7 +276,7 @@ DEFS ->  DEFQUAL #tdsVis DEF DEFS  #code ;
 		end
 	}
 
--- public, private, protected, static
+-- public, private, protected, static -------------------------------------------------------------
 DEFQUAL -> #visibility;
     #visibility {
         do
@@ -327,7 +328,7 @@ DEFQUAL -> static DEFQUAL #visibility;
         end
     }
     
--- attribut
+-- attribut ---------------------------------------------------------------------------------------
 DEF ->  TYPE ident pv #tdt #tds #code ;
 	#tdt {
 		local 
@@ -368,7 +369,7 @@ DEF ->  TYPE ident pv #tdt #tds #code ;
 		end
 	}
 
--- methode (fonction)
+-- methode (fonction) -----------------------------------------------------------------------------
 DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
     global
         tds:TDS;
@@ -416,7 +417,7 @@ DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
 	}
 	#code {
 		do
-		    DEF^code := BLOC^code;
+		    DEF^code := "\t;methode " + ident^txt + "\n" + BLOC^code;
 		end
 	}
     #debug {
@@ -425,10 +426,11 @@ DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
 	    end
     }
 
--- methode (procedure)
+-- methode (procedure) ----------------------------------------------------------------------------
 DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
     global
-        tds:TDS;
+        tds : TDS;
+        s : Signature;
     #tds {
 	    local 
 	        i:INFO;
@@ -444,7 +446,6 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
     }
 	#tdm {
 		local
-		    s : Signature;
 		    stemp : Signature; 
 		do
 		    s := new Signature();
@@ -463,7 +464,8 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
 	}
 	#code {
 		do
-		    DEF^code := BLOC^code;
+		    DEF^code := "\t;methode " + ident^txt + "\n" + BLOC^code + 
+                        DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
             -- TODO  : return. quelle taille ?
 		end
 	}
@@ -473,10 +475,11 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
 	    end
     }
 
--- constructeur
+-- constructeur -----------------------------------------------------------------------------------
 DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ; 
     global
-        tds:TDS;
+        tds : TDS;
+        s : Signature;
     #tds {
 	    local 
 	        i:INFO;
@@ -492,7 +495,6 @@ DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ;
     }
 	#tdm {
 		local
-		    s : Signature;
 		    stemp : Signature; 
 		do
 		    s := new Signature();
@@ -511,7 +513,8 @@ DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ;
 	}
 	#code {
 		do
-		    DEF^code := BLOC^code;
+		    DEF^code := "\t;constructeur " + ident^txt + "\n" + BLOC^code + 
+                        DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
 		end
 	}
     
@@ -521,7 +524,7 @@ DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ;
 	    end
     }
 
--- classe interne
+-- classe interne ---------------------------------------------------------------------------------
 DEF -> DEFCLASSE #code ;
 	#code {
 		do
@@ -529,7 +532,7 @@ DEF -> DEFCLASSE #code ;
 		end
 	}
 
--- les types
+-- les types --------------------------------------------------------------------------------------
 TYPE-> int  #type;
     #type { do TYPE^nom := "int"; end }
     
@@ -539,7 +542,7 @@ TYPE-> bool #type;
 TYPE-> ident #type;
     #type { do TYPE^nom := ident^txt; end }
     
--- parametres de methodes
+-- parametres de methodes -------------------------------------------------------------------------
 PARFS ->  #params;
 	#params {
 		do
@@ -601,7 +604,7 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 	    end
     }
 
--- corps de methode et bloc d'instructions
+-- corps de methode et bloc d'instructions --------------------------------------------------------
 BLOC ->  aco INSTS acf #code ;
 	#code {
 		do
@@ -609,7 +612,7 @@ BLOC ->  aco INSTS acf #code ;
 		end
 	}
 
--- instructions
+-- instructions -----------------------------------------------------------------------------------
 INSTS ->  #code ;
 	#code {
 		do
@@ -624,7 +627,7 @@ INSTS ->  INST INSTS #code ;
 		end
 	}
 
--- declaration de variable locale avec ou sans init
+-- declaration de variable locale avec ou sans init -----------------------------------------------
 INST->  TYPE #tdt ident AFFX #tds pv #code ;
      #tdt {
         local
@@ -658,7 +661,7 @@ INST->  TYPE #tdt ident AFFX #tds pv #code ;
 	    end
     }
 
--- instruction expression
+-- instruction expression -------------------------------------------------------------------------
 INST ->  E pv #code ;
 	#code {
 		do
@@ -666,7 +669,7 @@ INST ->  E pv #code ;
 		end
 	}
 
--- bloc d'instructions
+-- bloc d'instructions ----------------------------------------------------------------------------
 INST -> #tds BLOC #code ;
     #tds {
 	    do
@@ -679,7 +682,7 @@ INST -> #tds BLOC #code ;
 		end
 	}
 
--- conditionnelle
+-- conditionnelle ---------------------------------------------------------------------------------
 INST ->  si paro E parf #tds BLOC SIX #code ;
     #tds {
 	    do
@@ -713,7 +716,7 @@ SIX -> #code ;
 		end
 	}
 
--- return
+-- return -----------------------------------------------------------------------------------------
 INST ->  retour E pv #code ;
 	#code {
 		do
@@ -721,7 +724,7 @@ INST ->  retour E pv #code ;
 		end
 	}
 
--- tant que
+-- tant que ---------------------------------------------------------------------------------------
 INST ->  tantque paro E parf #tds BLOC #code ;
     #tds {
 	    do
@@ -734,7 +737,7 @@ INST ->  tantque paro E parf #tds BLOC #code ;
 		end
 	}
 
--- les expressions
+-- les expressions --------------------------------------------------------------------------------
 E ->  ER AFFX #code ;
 	#code {
 		do
@@ -742,7 +745,7 @@ E ->  ER AFFX #code ;
 		end
 	}
 
--- affectation
+-- affectation ------------------------------------------------------------------------------------
 AFFX ->  affect ER #code ;
 	#code {
 		do
@@ -757,11 +760,35 @@ AFFX -> #code ;
 		end
 	}
 
--- relation
-ER ->   ES ERX ;
-ES ->  T ESX ;
-ERX ->  OPREL ES ;
-ERX -> ;
+-- relation ---------------------------------------------------------------------------------------
+ER ->   ES ERX #code ;
+    #code {
+        do
+          ER^code := ER^machine.genExprValeur(ES^code, ERX^code); -- XXX
+        end
+    }
+
+ES ->  T ESX #code ;
+    #code {
+        do
+            ES^code := ES^machine.genExprValeur(T^code, ESX^code); -- XXX
+        end
+    }
+
+ERX ->  OPREL ES #code ;
+    #code {
+        do
+            ERX^code := ERX^machine.genExprValeur(ES^code, OPREL^code); -- XXX
+        end
+    }
+
+ERX -> #code ;
+    #code {
+        do
+            ERX^code := "";
+        end
+    }
+
 OPREL -> inf #code ;
     #code {
         do
@@ -804,11 +831,11 @@ OPREL -> neg #code ;
         end
     }
 
--- addition, ...
+-- addition, ... ----------------------------------------------------------------------------------
 ESX ->   OPADD T ESX #code ;
     #code {
         do
-          ESX^code := ""; -- ESX^machine.gen(); -- TODO
+          ESX^code := ESX^machine.genExprValeur(T^code, OPADD^code) + ESX1^code; -- XXX si T est une valeur ? ne pas faire le LOADI ?
         end
     }
 
@@ -840,10 +867,28 @@ OPADD -> ou #code ;
         end
     }
 
-T ->  F TX ;
--- multiplication, ...
-TX ->   OPMUL F TX ;
-TX -> ;
+T ->  F TX #code ;
+    #code {
+        do
+          T^code := T^machine.genExprValeur(F^code, TX^code); -- XXX
+        end
+    }
+
+-- multiplication, ... ----------------------------------------------------------------------------
+TX ->   OPMUL F TX #code ;
+    #code {
+        do
+          TX^code := TX^machine.genExprValeur(F^code, OPMUL^code) + TX1^code; -- XXX
+        end
+    }
+
+TX -> #code ;
+    #code {
+        do
+          TX^code := "";
+        end
+    }
+
 OPMUL -> mult #code ;
     #code {
         do
@@ -873,7 +918,7 @@ OPMUL -> et #code ;
     }
 
 
--- expressions de base
+-- expressions de base ----------------------------------------------------------------------------
 F -> entier #code ;
     #code {
         do
@@ -895,11 +940,11 @@ F -> faux #code ;
         end
     }
 
--- unaire
+-- unaire -----------------------------------------------------------------------------------------
 F ->  OPUN F #code ;
     #code {
         do
-          F^code := ""; -- TODO
+          F^code := F^machine.genExprValeur(F1^code, OPUN^code); -- XXX
         end
     }
     
@@ -924,7 +969,7 @@ OPUN -> non #code ;
         end
     }
     
--- null
+-- null -------------------------------------------------------------------------------------------
 F -> nil #code ;
     #code {
         do
@@ -939,7 +984,7 @@ F ->  paro E parf #code ;
         end
     }
     
--- new
+-- new --------------------------------------------------------------------------------------------
 F -> nouveau  TYPE paro ARGS parf #code ;
     #code {
         do
@@ -947,7 +992,7 @@ F -> nouveau  TYPE paro ARGS parf #code ;
         end
     }
     
--- this 
+-- this -------------------------------------------------------------------------------------------
 F -> this Q #code ;
     #code {
         do
@@ -955,7 +1000,7 @@ F -> this Q #code ;
         end
     }
     
--- appel super 
+-- appel super ------------------------------------------------------------------------------------
 F ->  super Q #code ;
     #code {
         do
@@ -963,7 +1008,7 @@ F ->  super Q #code ;
         end
     }
     
--- acces variable ou methode 
+-- acces variable ou methode ----------------------------------------------------------------------
 F ->  ident Q #code ;
     #code {
         do
@@ -971,11 +1016,11 @@ F ->  ident Q #code ;
         end
     }
     
--- Q = qualificateur de variable
+-- Q = qualificateur de variable  -----------------------------------------------------------------
 Q ->  ;
--- acces attribut
+-- acces attribut ---------------------------------------------------------------------------------
 Q ->  pt ident  Q ;
--- arguments d'appel de methode
+-- arguments d'appel de methode -------------------------------------------------------------------
 Q ->  paro ARGS parf Q ;
 ARGS ->  E ARGSX  ;
 ARGS -> ;

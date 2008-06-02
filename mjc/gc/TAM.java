@@ -66,10 +66,22 @@ public class TAM extends AbstractMachine {
     
     public String genReturn(String nomMethode, TDM tdm) {
     	System.out.println(nomMethode);
+    	Boolean isVoid = tdm.chercherGlobalement(nomMethode).getRetour() == null;
     	int size = tdm.chercherGlobalement(nomMethode).getParams().size();
-    	String res = "\t" + "RETURN (1) " + (size + 1) +
+    	int sizeRet;
+    	if (isVoid)
+    		sizeRet = 0;
+    	else
+    		sizeRet = 1;
+    	String res = "\t" + "RETURN (" + sizeRet + ") " + size +
     					"\t;on quitte " + nomMethode + "\n";
 		return res;
+	}
+    
+    public String genExprValeur(String f, String op) {
+		return 	f +
+				"\n\tLOADI (1)\t; on charge la valeur\n" +
+				op;
 	}
     
     public static String genLoadL(String value){

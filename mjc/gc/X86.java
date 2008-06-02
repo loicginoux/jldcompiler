@@ -20,6 +20,10 @@ public class X86 extends AbstractMachine {
 		return "";
 	}
 	
+	public String genExprValeur(String f, String op) {
+		return "";
+	}
+	
 	public String genTrue() {
 		return "";
 	}
