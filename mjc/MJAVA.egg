@@ -24,7 +24,7 @@ inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
 syn nom : String for TYPE;
 
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
-                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX;
+                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX, Q, ARGS, ARGSX;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
@@ -130,7 +130,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     }
     #sauv {
 	    local
-	        fac:Factory;
+	        fac : Factory;
 	    do
 	        fac := new Factory();
 	        call fac.persister(tds, tdt.getClassname() + ".tds");
@@ -1017,14 +1017,56 @@ F ->  ident Q #code ;
     }
     
 -- Q = qualificateur de variable  -----------------------------------------------------------------
-Q ->  ;
+Q ->  #code ;
+    #code {
+        do
+          Q^code := "";
+        end
+    }
+    
 -- acces attribut ---------------------------------------------------------------------------------
-Q ->  pt ident  Q ;
+Q ->  pt ident  Q #code ;
+    #code {
+        do
+          Q^code := ""; -- TODO
+        end
+    }
+    
 -- arguments d'appel de methode -------------------------------------------------------------------
-Q ->  paro ARGS parf Q ;
-ARGS ->  E ARGSX  ;
-ARGS -> ;
-ARGSX ->   virg E ARGSX  ;
-ARGSX -> ;
+Q ->  paro ARGS parf Q #code ;
+    #code {
+        do
+          Q^code := ""; -- TODO
+        end
+    }
+    
+ARGS ->  E ARGSX #code ;
+    #code {
+        do
+          ARGS^code := ""; -- TODO
+        end
+    }
+    
+ARGS -> #code ;
+    #code {
+        do
+          ARGS^code := "";
+        end
+    }
+    
+ARGSX ->   virg E ARGSX #code ;
+    #code {
+        do
+          ARGSX^code := ""; -- TODO
+        end
+    }
+    
+ARGSX -> #code ;
+    #code {
+        do
+          ARGSX^code := "";
+        end
+    }
+    
 
 end
