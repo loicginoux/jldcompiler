@@ -46,5 +46,6 @@ public abstract class AbstractMachine {
 	public abstract String genMod();
 	public abstract String genEt();
 	public abstract String genExprValeur(String f, String op);
+	public abstract String genSyso();
 	
 }

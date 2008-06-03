@@ -2,6 +2,7 @@ package mjc.tds;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,10 +41,10 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("\n");
-		Set<Map.Entry<String, INFO>> s = entrySet();
-		for (Map.Entry<String, INFO> e : s){
-			sb.append("var " + e.getKey() + " : " + e.getValue() + '\n');
 		
+		//pour avoir tout dans le bon ordre
+		for(String s:keySet()){
+			sb.append(s+" : "+get(s)+"\n");
 		}
 		
 		/*

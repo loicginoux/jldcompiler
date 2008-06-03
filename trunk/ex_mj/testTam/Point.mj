@@ -3,11 +3,7 @@ class Point {
 	private int x;
 	private int y;
 	
-	/* juste pour pas qu'il gueule */
-	public void syso(int a){
-	}
-	
-	public Point(int a,int b){
+	public Point(int a,int b,bool c,int d){
 		x=a;
 		this.y=b;
 	}
@@ -19,7 +15,7 @@ class Point {
 	
 	public void main(){
 		Point p;
-		p = new Point(2,4);
+		p = new Point(2,3*5+7);
 		
 		syso(p.getx());
 	}

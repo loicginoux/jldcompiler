@@ -88,6 +88,7 @@ sugar vrai is  "true";
 sugar faux is  "false";
 sugar this is  "this";
 sugar super is  "super";
+sugar syso is "syso"; --pour afficher a la console
 term entier is  "[0-9]+";
 term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
@@ -380,21 +381,32 @@ DEF ->  TYPE ident pv #tdt #tds #code ;
 	}
 
 -- methode (fonction) -----------------------------------------------------------------------------
-DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
+DEF ->  TYPE ident paro #tds PARFS #tdsap parf #tdt #tdm BLOC #code #debug;
     global
         tds:TDS;
 	#tds {
-	    local 
-	        i:INFO;
 	    do
 	        tds := new TDS(DEF^tds);
-	        PARFS^tds := tds;
-	        i := new INFO();
-	        call i.setType(DEF^tdt.getClassname());
-	        call tds.inserer("this",i); --ajout du this 
-	        
-	        BLOC^tds := tds; --auto par egg
+	        PARFS^tds := tds;    
 	    end
+    }
+    
+    #tdsap {
+    local 
+        i:INFO;
+    do
+            ---- passage du this ou non -----
+            if DEF^visibilitySyn.getDroite() then
+                write(ident^txt+" statique : pas encore traite a donf\n");
+                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+            else
+                i := new INFO();
+                call i.setType(DEF^tdt.getClassname());
+                call tds.inserer("this",i); --ajout du this 
+                BLOC^tds := tds;
+            end
+            ----------------------------------
+    end
     }
     #tdt {
 		local
@@ -437,22 +449,32 @@ DEF ->  TYPE ident paro #tds PARFS parf #tdt #tdm BLOC #code #debug;
     }
 
 -- methode (procedure) ----------------------------------------------------------------------------
-DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
+DEF -> void ident  paro #tds PARFS #tdsap parf #tdm  BLOC #code #debug;
     global
         tds : TDS;
         s : Signature;
     #tds {
-	    local 
-	        i:INFO;
 	    do
 	        tds := new TDS(DEF^tds);
 	        PARFS^tds := tds;
-	        i := new INFO();
-	        call i.setType(DEF^tdt.getClassname());
-	        call tds.inserer("this",i); --ajout du this 
-	        
-	        BLOC^tds := tds; --auto par egg
 	    end
+    }
+    #tdsap {
+    local 
+        i:INFO;
+    do
+            ---- passage du this ou non -----
+            if DEF^visibilitySyn.getDroite() then
+                write(ident^txt+" statique : pas encore traite a donf\n");
+                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+            else
+                i := new INFO();
+                call i.setType(DEF^tdt.getClassname());
+                call tds.inserer("this",i); --ajout du this 
+                BLOC^tds := tds;
+            end
+            ----------------------------------
+    end
     }
 	#tdm {
 		local
@@ -486,22 +508,33 @@ DEF -> void ident  paro #tds PARFS parf #tdm  BLOC #code #debug;
     }
 
 -- constructeur -----------------------------------------------------------------------------------
-DEF -> ident  paro #tds PARFS parf #tdm BLOC #code #debug ; 
+DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ; 
     global
         tds : TDS;
         s : Signature;
     #tds {
-	    local 
-	        i:INFO;
 	    do
 	        tds := new TDS(DEF^tds);
 	        PARFS^tds := tds;
-	        i := new INFO();
-	        call i.setType(DEF^tdt.getClassname());
-	        call tds.inserer("this",i); --ajout du this 
-	        
-	        BLOC^tds := tds; --auto par egg
 	    end
+    }
+    #tdsap {
+    local 
+        i:INFO;
+    do
+    
+            ---- passage du this ou non -----
+            if DEF^visibilitySyn.getDroite() then
+                write(ident^txt+" statique : pas encore traite a donf\n");
+                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+            else
+                i := new INFO();
+                call i.setType(DEF^tdt.getClassname());
+                call tds.inserer("this",i); --ajout du this 
+                BLOC^tds := tds;
+            end
+            ----------------------------------
+    end
     }
 	#tdm {
 		local
@@ -746,6 +779,14 @@ INST ->  tantque paro E parf #tds BLOC #code ;
 		    INST^code := INST^machine.genWhile(E^code, BLOC^code);
 		end
 	}
+
+-- le sysout ---------------------------------------------------------------------------------------
+INST -> syso paro E parf pv #code;
+    #code {
+    do
+        INST^code := E^code + INST^machine.genSyso();
+    end
+    }
 
 -- les expressions --------------------------------------------------------------------------------
 E ->  ER AFFX #code ;
