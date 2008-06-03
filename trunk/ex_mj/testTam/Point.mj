@@ -1,23 +1,27 @@
 class Point {
 
 	private int x;
+	private int y;
+	
+	/* juste pour pas qu'il gueule */
+	public void syso(int a){
+	}
+	
+	public Point(int a,int b){
+		x=a;
+		this.y=b;
+	}
 	
 	public int getx(){
-		return this.x;
+		return x;
 	}
-	
-	public void setx(int y){
-		x=y;
-	}
-	
-	public Point(int a){
-		setx(a);
-	}
+
 	
 	public void main(){
-		Point p = new Point(24);
-		p.setx(2);
-		p.setx(2+p.getx());
+		Point p;
+		p = new Point(2,4);
+		
+		syso(p.getx());
 	}
 	
 }

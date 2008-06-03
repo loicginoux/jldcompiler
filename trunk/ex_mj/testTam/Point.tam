@@ -1,32 +1,50 @@
-	JUMP Point_main
+JUMP Point_main_
 
-Point_getx_
-	;this dans la pile
-	LOADL 0 ;dep de x
-	SUBR Iadd ;avoir x
-	LOADI (1) ; toujours 1 int bool ou @
-	RETURN (1) 1 ;1 car fo virer le this
-	
-Point_setx_int
-	;pile : y;this
-	LOAD (1) 0 [LB] ;charger y
-	LOAD (1) 1 [LB] ; charger this
-	LOADL 0
-	SUBR Iadd ;obtenir l'@ de x
-	STOREI (1) ;x<-y
-	return (0) 2;
-	
-	
-	
-	
 Point_Point_intint
-	;on a en pile @;b;a
+	LOAD (1) -2[LB] ;a
+	LOAD (1) -1[LB] ; this
+	LOADL 0 ;dep de x
+	SUBR IAdd ;@ de x
+	STOREI (1)  ;x=a
+	
+	LOAD (1) -3[LB] ;b
+	LOAD (1) -1[LB] ; this
+	LOADL 1 ;dep de y
+	SUBR IAdd ;@ de y
+	STOREI (1)  ;y=b
+	
+	LOAD (1) -1 [LB] ;le this
+	RETURN (1) 3
+	
+Point_getx_int
+	LOAD (1) -1[LB]
+	LOADL 0
+	SUBR IAdd ;@ x
+	LOADI (1) ;x
+	RETURN (1) 1
+	
+Point_main_
+	PUSH 1 ;declaration de p @p = 0
+	
+	LOADL 4;
+	LOADL 2;
+	LOADL 2 ;taille de Point
+	SUBR MAlloc ;@de Point sur la pile
+	
+	CALL (LB) Point_Point_intint ;appel du constructeur
+	STORE (1) 0[LB] ;affectation de p
+	
+	LOAD (1) 0[LB] ;p.
+	CALL (LB) Point_getx_int ;getx
+	SUBR IOut ;syso
+	
+	LOADL 2; jute pour savoir
+	
+	HALT ;
 	
 	
-Point_main
-	PUSH 1 ; place pour p
-	loadl 1 ; taille de point
-	subr MAlloc
-	call Point_setx_int
-	halt
+	
+	
+	
+	
 	
