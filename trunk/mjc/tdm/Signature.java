@@ -109,6 +109,10 @@ public class Signature implements Serializable {
 		this.params = params;
 	}
 	
+	public int size(){
+		return params.size();
+	}
+	
 	public String getStringParams() {
 		List<String> list=this.params;
 		

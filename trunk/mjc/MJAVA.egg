@@ -40,6 +40,15 @@ inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, 
                                     OPREL, OPADD, OPMUL;
 inh nomMethode : String for INST, INSTS, BLOC, SIX;
 
+---deplacement ------------------------------------------------
+inh dep : Integer for PARFS,PARF,PARFSX,INSTS, INST, BLOC, SIX;
+syn taille : int for INST, INSTS;
+    --pour les attributs
+inh depatt : Integer for DEFS,DEF;
+syn tailleatt : Integer for DEF;
+----------------------------------------------------------------
+
+
 -- les terminaux ----------------------------------------------------------------------------------
 
 space separateur is  "[\r\n\t ]+";
@@ -199,7 +208,9 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 	}
 
 -- definition d'une classe ------------------------------------------------------------------------
-DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
+DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
+
+
 	#tdt {
 		local 
 		    type : Type;
@@ -218,6 +229,13 @@ DEFCLASSE -> classe ident #tdt #tdm EXTENSION aco DEFS acf #code ;
 		    call DEFCLASSE^tdm.setClassname(ident^txt);
 		end
 	}
+    
+    #attdep {
+    do
+        DEFS^depatt := 0; --XXX 1 pour extends pour le super
+    end
+    }
+    
 	#code {
 		do
 		    DEFCLASSE^code := ";classe "+ ident^txt + "\n" + DEFS^code;
@@ -274,18 +292,27 @@ DEFS ->  #code ;
 		    DEFS^code := "";
 		end
 	}
+    
 
-DEFS ->  DEFQUAL #tdsVis DEF DEFS  #code ;
+DEFS ->  DEFQUAL #tdsVis DEF #dep DEFS  #code ;
 	#tdsVis {
 		do
 		    DEF^visibilitySyn := DEFQUAL^visibility;
 		end
 	}
+    
+    #dep {
+    do
+        DEFS1^depatt := DEFS^depatt + DEF^tailleatt;
+    end
+    }
+    
 	#code {
 		do
 		    DEFS^code := DEF^code + "\n" + DEFS1^code;
 		end
 	}
+    
 
 -- public, private, protected, static -------------------------------------------------------------
 DEFQUAL -> #visibility;
@@ -340,7 +367,7 @@ DEFQUAL -> static DEFQUAL #visibility;
     }
     
 -- attribut ---------------------------------------------------------------------------------------
-DEF ->  TYPE ident pv #tdt #tds #code ;
+DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 	#tdt {
 		local 
 		    type : Type;
@@ -367,6 +394,10 @@ DEF ->  TYPE ident pv #tdt #tds #code ;
 		        call i.setVisibility(DEF^visibilitySyn.getGauche());
 		        call i.setType(TYPE^nom);
 		        call DEF^tds.inserer(ident^txt, i);
+                
+                ---deplacement
+                    call i.setDep(DEF^depatt);
+                -------------
 		    else
 		        error(B_05, ident^txt);
 		    end
@@ -379,21 +410,31 @@ DEF ->  TYPE ident pv #tdt #tds #code ;
 		    -- de declarer et d'initiliser en meme temps un attribut
 		end
 	}
+    
+    #tailleatt {
+    do
+        DEF^tailleatt := 1;
+    end
+    }
 
 -- methode (fonction) -----------------------------------------------------------------------------
-DEF ->  TYPE ident paro #tds PARFS #tdsap parf #tdt #tdm BLOC #code #debug;
+DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #code #debug;
     global
         tds:TDS;
 	#tds {
 	    do
 	        tds := new TDS(DEF^tds);
 	        PARFS^tds := tds;    
+            
+            ----deplacement de base
+            PARFS^dep := -1;
 	    end
     }
     
     #tdsap {
     local 
         i:INFO;
+        s:Signature;
     do
             ---- passage du this ou non -----
             if DEF^visibilitySyn.getDroite() then
@@ -404,8 +445,23 @@ DEF ->  TYPE ident paro #tds PARFS #tdsap parf #tdt #tdm BLOC #code #debug;
                 call i.setType(DEF^tdt.getClassname());
                 call tds.inserer("this",i); --ajout du this 
                 BLOC^tds := tds;
+                
+                --deplacement
+                    ---choper la methode
+                    s := new Signature();
+                    call s.ajouter(PARFS^params);
+                    s := DEF^tdm.get(ident^txt + "_" + s.getStringParams());
+                    call i.setDep(-1-s.size());
+                ------------------------
+                
+               
             end
             ----------------------------------
+    end
+    }
+    #dep {
+    do
+        BLOC^dep := 0;
     end
     }
     #tdt {
@@ -437,6 +493,11 @@ DEF ->  TYPE ident paro #tds PARFS #tdsap parf #tdt #tdm BLOC #code #debug;
 		    BLOC^nomMethode := ident^txt + "_" + s.getStringParams();
 		end
 	}
+    #tailleatt {
+    do
+        DEF^tailleatt := 0;
+    end
+    }
 	#code {
 		do
 		    DEF^code := "\t;methode " + ident^txt + "\n" + BLOC^code;
@@ -444,12 +505,12 @@ DEF ->  TYPE ident paro #tds PARFS #tdsap parf #tdt #tdm BLOC #code #debug;
 	}
     #debug {
 	    do
-	        write("tds de "+ident^txt+" : "+tds);
+	        -- write("tds de "+ident^txt+" : "+tds);
 	    end
     }
 
 -- methode (procedure) ----------------------------------------------------------------------------
-DEF -> void ident  paro #tds PARFS #tdsap parf #tdm  BLOC #code #debug;
+DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt;
     global
         tds : TDS;
         s : Signature;
@@ -457,11 +518,15 @@ DEF -> void ident  paro #tds PARFS #tdsap parf #tdm  BLOC #code #debug;
 	    do
 	        tds := new TDS(DEF^tds);
 	        PARFS^tds := tds;
+            
+            ----deplacement de base
+            PARFS^dep := -1;
 	    end
     }
     #tdsap {
     local 
         i:INFO;
+        s2:Signature;
     do
             ---- passage du this ou non -----
             if DEF^visibilitySyn.getDroite() then
@@ -472,8 +537,22 @@ DEF -> void ident  paro #tds PARFS #tdsap parf #tdm  BLOC #code #debug;
                 call i.setType(DEF^tdt.getClassname());
                 call tds.inserer("this",i); --ajout du this 
                 BLOC^tds := tds;
+                
+                --deplacement
+                    ---choper la methode
+                    s2 := new Signature();
+                    call s2.ajouter(PARFS^params);
+                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
+                    call i.setDep(-1-s2.size());
+                ------------------------
             end
             ----------------------------------
+           
+    end
+    }
+    #dep {
+    do
+        BLOC^dep := 0;
     end
     }
 	#tdm {
@@ -501,14 +580,19 @@ DEF -> void ident  paro #tds PARFS #tdsap parf #tdm  BLOC #code #debug;
             -- TODO  : return. quelle taille ?
 		end
 	}
+    #tailleatt {
+    do
+        DEF^tailleatt := 0;
+    end
+    }
     #debug {
 	    do
-	        write("tds de "+ident^txt+" : "+tds);
+	       -- write("tds de "+ident^txt+" : "+tds);
 	    end
     }
 
 -- constructeur -----------------------------------------------------------------------------------
-DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ; 
+DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt ; 
     global
         tds : TDS;
         s : Signature;
@@ -516,11 +600,15 @@ DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ;
 	    do
 	        tds := new TDS(DEF^tds);
 	        PARFS^tds := tds;
+            
+            ----deplacement de base
+            PARFS^dep := -1;
 	    end
     }
     #tdsap {
     local 
         i:INFO;
+        s2:Signature;
     do
     
             ---- passage du this ou non -----
@@ -532,8 +620,21 @@ DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ;
                 call i.setType(DEF^tdt.getClassname());
                 call tds.inserer("this",i); --ajout du this 
                 BLOC^tds := tds;
+                
+                --deplacement
+                    ---choper la methode
+                    s2 := new Signature();
+                    call s2.ajouter(PARFS^params);
+                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
+                    call i.setDep(-1-s2.size());
+                ------------------------
             end
             ----------------------------------
+    end
+    }
+    #dep{
+    do
+        BLOC^dep := 0;
     end
     }
 	#tdm {
@@ -554,6 +655,11 @@ DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ;
 		    BLOC^nomMethode := ident^txt + "_" + s.getStringParams();
 		end
 	}
+    #tailleatt {
+    do
+        DEF^tailleatt := 0;
+    end
+    }
 	#code {
 		do
 		    DEF^code := "\t;constructeur " + ident^txt + "\n" + BLOC^code + 
@@ -563,17 +669,24 @@ DEF -> ident  paro #tds PARFS #tdsap parf #tdm BLOC #code #debug ;
     
     #debug {
 	    do
-	        write("tds de "+ident^txt+" : "+tds);
+	       -- write("tds de "+ident^txt+" : "+tds);
 	    end
     }
 
 -- classe interne ---------------------------------------------------------------------------------
-DEF -> DEFCLASSE #code ;
+DEF -> DEFCLASSE #code #tailleatt;
 	#code {
 		do
 		    DEF^code := DEFCLASSE^code;
+            error(B_INT); --non traite
 		end
 	}
+    
+    #tailleatt {
+    do
+        DEF^tailleatt := 0;
+    end
+    }
 
 -- les types --------------------------------------------------------------------------------------
 TYPE-> int  #type;
@@ -608,7 +721,14 @@ PARFSX -> #params  ;
 		end
 	}
 
-PARFSX -> virg  PARF  PARFSX #params ;
+PARFSX -> virg  #dep PARF  PARFSX #params ;
+    #dep {
+    do
+        PARF^dep := PARFSX^dep -1;
+        PARFSX1^dep := PARFSX^dep -1;
+    end
+    }
+    
 	#params {
 		do
 		    call PARFSX1^params.add(PARF^param);
@@ -625,6 +745,8 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 		    if t = nil then  error(B_04, TYPE^nom); --type inconnu ds les import
 		    else
 		    end 
+            
+            
 		end
 	}
 	#param {
@@ -643,27 +765,61 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 	            i := new INFO();
 	            call i.setType(TYPE^nom);
 	            call PARF^tds.inserer(ident^txt,i);
+                
+                --deplacement
+                call i.setDep(PARF^dep);
 	        end
 	    end
     }
 
 -- corps de methode et bloc d'instructions --------------------------------------------------------
-BLOC ->  aco INSTS acf #code ;
+BLOC ->  aco #dep INSTS acf #code #debug;
+    #dep {
+    do
+        INSTS^dep := BLOC^dep;
+    end
+    }
 	#code {
 		do
 		    BLOC^code := INSTS^code;
 		end
 	}
+    
+    #debug {
+    do
+    write("tdsbloc : "+BLOC^tds+"\n");
+    end
+    }
 
 -- instructions -----------------------------------------------------------------------------------
-INSTS ->  #code ;
+INSTS ->  #code #taille ;
 	#code {
 		do
 		    INSTS^code := "";
 		end
 	}
+    #taille {
+    do
+        INSTS^taille := 0;
+    end
+    }
 
-INSTS ->  INST INSTS #code ;
+INSTS -> #dep2  INST #dep INSTS #taille #code  ;
+    #dep2 {
+    do
+        INST^dep := INSTS^dep; --auto par egg
+    end
+    }
+    #dep {
+    do 
+        INSTS1^dep := INSTS^dep + INST^taille;
+    end
+    }
+    #taille {
+    do
+        INSTS^taille := INST^taille + INSTS1^taille;
+    end
+    }
 	#code {
 		do
 		    INSTS^code := INST^code + "\n" + INSTS1^code;
@@ -671,7 +827,7 @@ INSTS ->  INST INSTS #code ;
 	}
 
 -- declaration de variable locale avec ou sans init -----------------------------------------------
-INST->  TYPE #tdt ident AFFX #tds pv #code ;
+INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
      #tdt {
         local
             t : Type;
@@ -682,30 +838,47 @@ INST->  TYPE #tdt ident AFFX #tds pv #code ;
             end 
         end
     }
+    
+    #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
+        local 
+            i:INFO;
+        do
+            
+            i := INST^tds.chercherLocalement(ident^txt);
+            if i /= nil then
+                error(B_08, ident^txt);
+            else
+                i := new INFO();
+                call i.setType(TYPE^nom);
+                call INST^tds.inserer(ident^txt, i);
+                
+                --deplacement
+                    call i.setDep(INST^dep);
+                -------------------
+            end
+        end
+    }
+    #taille {
+    do
+        INST^taille := 1;  --car TYPE^taille = 1 tout le temps !!
+    end
+    }
 	#code {
 		do
 		    INST^code := AFFX^code;
 		end
 	}
     
-    #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
-	    local 
-	        i:INFO;
-	    do
-	        
-	        i := INST^tds.chercherLocalement(ident^txt);
-	        if i /= nil then
-	            error(B_08, ident^txt);
-	        else
-	            i := new INFO();
-	            call i.setType(TYPE^nom);
-	            call INST^tds.inserer(ident^txt, i);
-	        end
-	    end
-    }
+    
 
 -- instruction expression -------------------------------------------------------------------------
-INST ->  E pv #code ;
+INST ->  E pv #taille #code ;
+    #taille {
+    do
+        INST^taille := 0;
+    end
+    }
+    
 	#code {
 		do
 		    INST^code := E^code;
@@ -713,11 +886,21 @@ INST ->  E pv #code ;
 	}
 
 -- bloc d'instructions ----------------------------------------------------------------------------
-INST -> #tds BLOC #code ;
+INST -> #tds #dep BLOC #taille #code  ;
     #tds {
 	    do
 	        BLOC^tds := new TDS(INST^tds);
 	    end
+    }
+    #dep {
+    do
+        BLOC^dep := INST^dep;
+    end
+    }
+    #taille {
+    do
+        INST^taille := 0;
+    end
     }
 	#code {
 		do
@@ -726,12 +909,23 @@ INST -> #tds BLOC #code ;
 	}
 
 -- conditionnelle ---------------------------------------------------------------------------------
-INST ->  si paro E parf #tds BLOC SIX #code ;
+INST ->  si paro E parf #tds #dep BLOC SIX #taille #code ;
     #tds {
 	    do
 	        BLOC^tds := new TDS(INST^tds);
 	        SIX^tds := INST^tds ; --auto par egg
 	    end
+    }
+    #dep {
+    do
+        BLOC^dep := INST^dep;
+        SIX^dep := INST^dep;
+    end
+    }
+    #taille {
+    do
+        INST^taille := 0;
+    end
     }
 	#code {
 		do
@@ -740,11 +934,16 @@ INST ->  si paro E parf #tds BLOC SIX #code ;
 	}
     
 
-SIX ->   sinon #tds BLOC #code ;
+SIX ->   sinon #tds #dep BLOC #code ;
     #tds {
 	    do
 	        BLOC^tds := new TDS(SIX^tds);
 	    end
+    }
+    #dep {
+    do
+        BLOC^dep := SIX^dep;
+    end
     }
 	#code {
 		do
@@ -760,7 +959,12 @@ SIX -> #code ;
 	}
 
 -- return -----------------------------------------------------------------------------------------
-INST ->  retour E pv #code ;
+INST ->  retour E pv #taille #code ;
+    #taille {
+    do
+        INST^taille := 0;
+    end
+    }
 	#code {
 		do
 		    INST^code := E^code + INST^machine.genReturn(INST^nomMethode, INST^tdm); -- XXX a verifier
@@ -768,11 +972,21 @@ INST ->  retour E pv #code ;
 	}
 
 -- tant que ---------------------------------------------------------------------------------------
-INST ->  tantque paro E parf #tds BLOC #code ;
+INST ->  tantque paro E parf #tds #dep BLOC #taille #code ;
     #tds {
 	    do
 	        BLOC^tds := new TDS(INST^tds);
 	    end
+    }
+    #dep {
+    do
+        BLOC^dep := INST^dep;
+    end
+    }
+    #taille {
+    do
+        INST^taille := 0;
+    end
     }
 	#code {
 		do
@@ -781,7 +995,12 @@ INST ->  tantque paro E parf #tds BLOC #code ;
 	}
 
 -- le sysout ---------------------------------------------------------------------------------------
-INST -> syso paro E parf pv #code;
+INST -> syso paro E parf pv #taille #code;
+    #taille {
+    do
+        INST^taille := 0;
+    end
+    }
     #code {
     do
         INST^code := E^code + INST^machine.genSyso();

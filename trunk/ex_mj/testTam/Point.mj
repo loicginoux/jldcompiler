@@ -11,9 +11,47 @@ class Point {
 	public int getx(){
 		return x;
 	}
+	
+	//dep attendu : 
+	// avif : 0
+	//		nul : 1
+	//			cpt : 2
+	//				auxx : 3
+	//				auxy : 4
+	//		rate : 1
+	// apif : 1
+	//
+	// dep : -1
+	// this : -2
+	// 
+	public void transcomplexe(int dep){
+		int avif;
+		if(dep>0){
+			int nul;
+			nul=0;
+			{
+				int cpt=dep;
+				while(cpt>0){
+					int auxx=x;
+					int auxy=y;
+					x=auxx+1;
+					y=auxy+1;
+					cpt=cpt-1;
+				}
+			}
+		}else{
+			int rate=-1;
+			syso(rate);
+		}
+		int apif;
+		
+	}
+				
+	
+	private bool z; //definition d'un attribut en plein milieu
 
 	
-	public void main(){
+	public static void main(){
 		Point p;
 		p = new Point(2,3*5+7);
 		
