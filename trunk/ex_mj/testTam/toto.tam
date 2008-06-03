@@ -1,1 +1,22 @@
-LOADL 3
+JUMP main
+;fonction qui ajoute 2 puis affiche : int a; a=param; syso(a+2); return 
+f
+PUSH 1 ;variable locale a
+LOAD (1) -1[LB] ;charger le parametre 
+STORE (1) 3[LB] ;a=param
+LOADL 2
+LOAD (1) 3[LB] ;charger a
+SUBR IAdd	;a+2
+SUBR IOut ; afficher
+RETURN (0) 1 ;virer param de la pile
+
+
+main
+LOADL 3 ;charger 3
+LOADL 2 ;charger 2
+LOADL 4 ; charger param=4
+CALL (LB) f
+LOADL 6;
+
+
+HALT ;fin
