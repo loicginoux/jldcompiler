@@ -3,7 +3,11 @@ package mjc.gc;
 import mjc.tdm.TDM;
 
 public class SPARC extends AbstractMachine {
-
+@Override
+public String genSyso() {
+	// TODO Auto-generated method stub
+	return null;
+}
 	public String getSuffixe() {
 		return "s";
 	}

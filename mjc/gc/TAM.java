@@ -7,6 +7,9 @@ import mjc.tdt.TDT;
 
 public class TAM extends AbstractMachine {
 	
+	public String genSyso() {
+		return "\tSUBR SOut\n"; 
+	}
 	private static int n = 0;
 
 	/*
