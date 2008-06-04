@@ -483,7 +483,7 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
     }
     #dep {
 	    do
-	        BLOC^dep := 0;
+	         BLOC^dep := 3; --header
 	    end
     }
     #tdt {
@@ -575,7 +575,7 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
     }
     #dep {
 	    do
-	        BLOC^dep := 0;
+	         BLOC^dep := 3; --header
 	    end
     }
 	#tdm {
@@ -658,7 +658,7 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
     }
     #dep {
 	    do
-	        BLOC^dep := 0;
+	        BLOC^dep := 3; --header
 	    end
     }
 	#tdm {
@@ -859,8 +859,12 @@ INST->  TYPE #tdt ident #aff AFFX #tds pv #taille #code ;
         end
     }
     #aff {
+        local
+            aff:Affectable;
         do
-            AFFX^isAffectable := new Affectable(true);
+            aff := new Affectable(true);
+            call aff.setAdr(INST^machine.genExprIdent(INST^dep, ident^txt));
+            AFFX^isAffectable := aff; 
         end
     }
     #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
@@ -888,8 +892,12 @@ INST->  TYPE #tdt ident #aff AFFX #tds pv #taille #code ;
 	    end
     }
 	#code {
+        local
+            loada:String;
 		do
-		    INST^code := AFFX^code;
+           
+		    INST^code := INST^machine.genReserve(ident^txt) +
+                         AFFX^code;
 		end
 	}
     
@@ -1049,7 +1057,7 @@ INST -> syso paro #aff E parf pv #taille #code;
     }
     #code {
 	    do
-	        INST^code := E^code + INST^machine.genSyso();
+	        INST^code := E^code + INST^machine.genSyso("int"); --todo E^type
 	    end
     }
 
@@ -1074,7 +1082,7 @@ AFFX ->  #aff affect ER #code ;
     }
 	#code {
 		do
-		    AFFX^code := ER^code + AFFX^machine.genStore(); -- XXX
+		    AFFX^code := ER^code + AFFX^isAffectable.getAdr() + AFFX^machine.genStore(); -- XXX
 		end
 	}
 
@@ -1479,7 +1487,8 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
         do
           code := F^machine.genExprIdent(F^tds, ident^txt);
           if F^isAffectable.isAffectable() then
-            F^code := code;
+            call F^isAffectable.setAdr(code);
+            F^code := "";
           else
             -- on le charge
             F^code := code + F^machine.genLoadI(ident^txt);

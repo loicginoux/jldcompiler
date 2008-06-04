@@ -28,6 +28,7 @@ public abstract class AbstractMachine {
 	public abstract String genReturn(String nomMethode, TDM tdm);
 	public abstract String genDefMethode(String nomMethode);
 	public abstract String genExprIdent(TDS tds, String ident);
+	public abstract String genExprIdent(int dep, String ident);
 	public abstract String genLinkage(String code, String className);
 	public abstract String genTrue();
     public abstract String genFalse();
@@ -50,8 +51,9 @@ public abstract class AbstractMachine {
 	public abstract String genMod();
 	public abstract String genEt();
 	public abstract String genExprValeur(String f, String op);
-	public abstract String genSyso();
+	public abstract String genSyso(String type);
 	public abstract String genStore();
 	public abstract String genLoadI(String s);
+	public abstract String genReserve(String nom);
 	
 }
