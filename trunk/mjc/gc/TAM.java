@@ -108,6 +108,10 @@ public class TAM extends AbstractMachine {
     	return nomMethode + "\n";
     }
     
+    public String genStore() {
+		return "";
+	}
+    
     public static String genLoadL(String value){
     	return "\tLOADL " + value + "\n";
     }
