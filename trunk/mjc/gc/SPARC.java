@@ -4,11 +4,16 @@ import mjc.tdm.TDM;
 import mjc.tds.TDS;
 
 public class SPARC extends AbstractMachine {
-@Override
-public String genSyso() {
-	// TODO Auto-generated method stub
-	return null;
-}
+    @Override
+    public String genLoadI(String ident) {
+    	return "\tLOADI (1) ;val " +ident+"\n";
+    }
+
+	@Override
+	public String genSyso() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	public String getSuffixe() {
 		return "s";
 	}
