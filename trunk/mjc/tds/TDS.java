@@ -2,9 +2,6 @@ package mjc.tds;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 public class TDS extends HashMap<String, INFO> implements Serializable {
 
@@ -65,10 +62,15 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	}
 	
 	public TDS getPlusHaute(){
+		try{
 		if (isPlusHaute)
 			return this;
 		else
 			return parente.getPlusHaute();
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public void setParente(TDS parente) {
