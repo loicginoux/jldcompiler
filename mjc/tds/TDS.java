@@ -11,15 +11,18 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private TDS parente;
+	private boolean isPlusHaute;
 
 	public TDS() {
 		super();
 		parente = null;
+		isPlusHaute=false;
 	}
 
 	public TDS(TDS p) {
 		super();
 		parente = p;
+		isPlusHaute=false;
 	}
 
 	public INFO chercherLocalement(String n) {
@@ -62,7 +65,7 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	}
 	
 	public TDS getPlusHaute(){
-		if (parente==null)
+		if (isPlusHaute)
 			return this;
 		else
 			return parente.getPlusHaute();
@@ -70,5 +73,9 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	public void setParente(TDS parente) {
 		this.parente = parente;
+	}
+
+	public void setPlusHaute(boolean isPlusHaute) {
+		this.isPlusHaute = isPlusHaute;
 	}
 }

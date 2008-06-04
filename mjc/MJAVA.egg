@@ -123,6 +123,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
     #tds {
         do
             tds := new TDS();
+            call tds.setPlusHaute(true);
             DEFCLASSE^tds := tds;
         end
     }
