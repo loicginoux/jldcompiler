@@ -13,13 +13,13 @@ class Point {
 	}
 	
 	//dep attendu : 
-	// avif : 0
-	//		nul : 1
-	//			cpt : 2
-	//				auxx : 3
-	//				auxy : 4
-	//		rate : 1
-	// apif : 1
+	// avif : 3
+	//		nul : 4
+	//			cpt : 5
+	//				auxx : 6
+	//				auxy : 7
+	//		rate : 4
+	// apif : 4
 	//
 	// dep : -1
 	// this : -2

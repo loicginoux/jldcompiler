@@ -6,8 +6,13 @@ import mjc.tds.TDS;
 
 public class TAM extends AbstractMachine {
 	
-	public String genSyso() {
-		return "\tSUBR SOut\n"; 
+	public String genSyso(String type) {
+		if (type.equals("int"))
+			return "\tSUBR IOut\n"; 
+		else if (type.equals("bool")) //bool
+			return "\tSUBR BOut\n";
+		else //string
+			return "\tSUBR SOut\n";
 	}
 	private static int n = 0;
 
@@ -50,15 +55,15 @@ public class TAM extends AbstractMachine {
     	if (codeBloc2.equals("")) {
     		res = "\tJUMPIF(0) " + et1 + "\t;si\n" + 
     				codeBloc1 +
-    				et1 + "\t;fin si\n";
+    				et1 + "\t\t;fin si\n";
     	} else {
     		String et2 = genEtiq();
-    		res = "\tJUMPIF(0) " + et1 + "\t;si\n" + 
+    		res = "\tJUMPIF(0) " + et1 + "\t\t;si\n" + 
 		        	codeBloc1 + 
 		        	"\tJUMP " + et2 + "\n" + 
-		        	et1 + "\t;sinon\n" + 
+		        	et1 + "\t\t;sinon\n" + 
 		        	codeBloc2 +
-		        	et2 + "\t;fin si\n";
+		        	et2 + "\t\t;fin si\n";
     	}
     	return res;
     }
@@ -69,7 +74,7 @@ public class TAM extends AbstractMachine {
 
 		return startWhile + "\n" + condition + "\t" + "JUMPIF (0) " + endWhile + "\t;while\n"
 				+ "\n" + bloc + "\t" + "JUMP " + startWhile + "\n"
-				+ endWhile + "\t;fin while\n";
+				+ endWhile + "\t\t;fin while\n";
 	}
     
     public String genReturn(String nomMethode, TDM tdm) {
@@ -85,23 +90,27 @@ public class TAM extends AbstractMachine {
     	else
     		sizeRet = 1;
     	String res = "\t" + "RETURN (" + sizeRet + ") " + size +
-    					"\t;on quitte " + nomMethode + "\n";
+    					"\t; on quitte " + nomMethode + "\n";
 		return res;
 	}
     
     public String genExprValeur(String f, String op) {
 		return 	f +
-				"\n\tLOADI (1)\t; on charge la valeur\n" +
+				"\n\tLOADI (1)\t\t; on charge la valeur\n" +
 				op;
 	}
     
     public String genExprIdent(TDS tds, String ident) {
     	String code;
     	if (tds.chercherGlobalement(ident).isAttribute()) 
-    		code = "\t;NOT YET IMPLANTED ";
+    		code = "\t\t;NOT YET IMPLANTED ";
     	else
-    		code = "LOADA " + tds.chercherGlobalement(ident).getDep() + " [LB]"; 
-    	return "\t" + code + "; @ "+ident+"\n";
+    		code = "LOADA " + tds.chercherGlobalement(ident).getDep() + "[LB]"; 
+    	return "\t" + code + "\t\t; @ "+ident+"\n";
+    }
+    
+    public String genExprIdent(int dep, String ident) {
+    	return "\tLOADA " + dep + "[LB]\t\t; @ "+ident+"\n";
     }
     
     public String genDefMethode(String nomMethode) {
@@ -213,12 +222,16 @@ public class TAM extends AbstractMachine {
     
     @Override
     public String genLoadI(String ident) {
-    	return "\tLOADI (1) ;val " +ident+"\n";
+    	return "\tLOADI (1)\t\t; val " +ident+"\n";
     }
     
     @Override
     public String genStore() {
     	return "\tSTOREI(1)\n";
+    }
+    @Override
+    public String genReserve(String nom) {
+    	return "\tPUSH 1\t\t\t; place de "+nom+"\n";
     }
 
 }
