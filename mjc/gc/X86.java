@@ -41,6 +41,10 @@ public String genSyso() {
 		return "";
 	}
 	
+	public String genStore() {
+		return "";
+	}
+	
 	public String genTrue() {
 		return "";
 	}
