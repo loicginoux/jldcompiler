@@ -49,12 +49,16 @@ class Point {
 				
 	
 	private bool z; //definition d'un attribut en plein milieu
+	
+	public Point getMoi(){
+		return this;
+	}
 
 	
 	public static void main(){
 		Point p;
 		p = new Point(2,3*5+7);
-		p.getx();
+		p.x=6;
 		syso(p.getx());
 	}
 	

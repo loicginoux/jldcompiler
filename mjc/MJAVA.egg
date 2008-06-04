@@ -4,7 +4,7 @@
 ------------------------------------------
 option auto= true;
 option version = 0.0.1 ;
-option k=3;
+option k = 3;
 
 -- les attributs semantiques ----------------------------------------------------------------------
 inh source : MJAVASourceFile for PROGRAMME;
@@ -24,6 +24,7 @@ syn tdts : List<TDT> for IMPORTS;
 
 syn visibility : COUPLE<Integer,Boolean> for DEFQUAL;
 inh visibilitySyn : COUPLE<Integer,Boolean> for DEF;
+inh isAffectable : Affectable for AFFX, E, ER, F, T,TX,ES,ESX,ERX,ARGS,ARGSX,Q;
 
 syn nom : String for TYPE;
 
@@ -825,7 +826,7 @@ INSTS -> #dep2  INST #dep INSTS #taille #code  ;
 	}
 
 -- declaration de variable locale avec ou sans init -----------------------------------------------
-INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
+INST->  TYPE #tdt ident #aff AFFX #tds pv #taille #code ;
      #tdt {
         local
             t : Type;
@@ -834,6 +835,11 @@ INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
             if t = nil then  error(B_04, TYPE^nom); --type inconnu ds les import
             else
             end 
+        end
+    }
+    #aff {
+        do
+            AFFX^isAffectable := new Affectable(true);
         end
     }
     #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
@@ -867,7 +873,12 @@ INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
 	}
     
 -- instruction expression -------------------------------------------------------------------------
-INST ->  E pv #taille #code ;
+INST -> #aff E pv #taille #code ;
+    #aff {
+	    do
+	        E^isAffectable := new Affectable(true);
+	    end
+    }
     #taille {
 	    do
 	        INST^taille := 0;
@@ -903,7 +914,12 @@ INST -> #tds #dep BLOC #taille #code  ;
 	}
 
 -- conditionnelle ---------------------------------------------------------------------------------
-INST ->  si paro E parf #tds #dep BLOC SIX #taille #code ;
+INST ->  si paro #aff E parf #tds #dep BLOC SIX #taille #code ;
+    #aff {
+        do
+            E^isAffectable := new Affectable(false);
+        end
+    }
     #tds {
 	    do
 	        BLOC^tds := new TDS(INST^tds);
@@ -953,7 +969,12 @@ SIX -> #code ;
 	}
 
 -- return -----------------------------------------------------------------------------------------
-INST ->  retour E pv #taille #code ;
+INST ->  retour #aff E pv #taille #code ;
+    #aff {
+        do
+            E^isAffectable := new Affectable(false);
+        end
+    }
     #taille {
 	    do
 	        INST^taille := 0;
@@ -966,7 +987,12 @@ INST ->  retour E pv #taille #code ;
 	}
 
 -- tant que ---------------------------------------------------------------------------------------
-INST ->  tantque paro E parf #tds #dep BLOC #taille #code ;
+INST ->  tantque paro #aff E parf #tds #dep BLOC #taille #code ;
+    #aff {
+        do
+            E^isAffectable := new Affectable(false);
+        end
+    }
     #tds {
 	    do
 	        BLOC^tds := new TDS(INST^tds);
@@ -989,7 +1015,12 @@ INST ->  tantque paro E parf #tds #dep BLOC #taille #code ;
 	}
 
 -- le sysout ---------------------------------------------------------------------------------------
-INST -> syso paro E parf pv #taille #code;
+INST -> syso paro #aff E parf pv #taille #code;
+    #aff {
+        do
+            E^isAffectable := new Affectable(false);
+        end
+    }
     #taille {
 	    do
 	        INST^taille := 0;
@@ -1002,18 +1033,26 @@ INST -> syso paro E parf pv #taille #code;
     }
 
 -- les expressions --------------------------------------------------------------------------------
-E ->  ER AFFX #code ;
+E -> ER  AFFX #code ;
 	#code {
 		do
-		    E^code := ""; -- E^machine.genExpression(); -- TODO
+		    E^code := "\t\t;NOT IMPLEMENTED\n"; -- E^machine.genExpression(); -- TODO
 		end
 	}
 
 -- affectation ------------------------------------------------------------------------------------
-AFFX ->  affect ER #code ;
+AFFX ->  #aff affect ER #code ;
+    #aff {
+        do
+            if AFFX^isAffectable.isAffectable() then
+            else
+                error(B_15);
+            end
+        end
+    }
 	#code {
 		do
-		    AFFX^code := ""; -- AFFX^machine.genValeur(); -- TODO
+		    AFFX^code := ER^code; -- XXX
 		end
 	}
 
@@ -1028,21 +1067,26 @@ AFFX -> #code ;
 ER ->   ES ERX #code ;
     #code {
         do
-          ER^code := "";--ER^machine.genExprValeur(ES^code, ERX^code); -- XXX
+          ER^code := ES^code + ERX^code; -- XXX
         end
     }
 
 ES ->  T ESX #code ;
     #code {
         do
-            ES^code := "";--ES^machine.genExprValeur(T^code, ESX^code); -- XXX
+            ES^code := T^code + ESX^code; -- XXX
         end
     }
 
-ERX ->  OPREL ES #code ;
+ERX ->  OPREL #aff ES #code ;
+    #aff {
+        do
+            call ERX^isAffectable.setAffectable(false);
+        end
+    }
     #code {
         do
-            ERX^code := "";--ERX^machine.genExprValeur(ES^code, OPREL^code); -- XXX
+            ERX^code := ES^code + OPREL^code; -- XXX
         end
     }
 
@@ -1096,10 +1140,15 @@ OPREL -> neg #code ;
     }
 
 -- addition, ... ----------------------------------------------------------------------------------
-ESX ->   OPADD T ESX #code ;
+ESX ->   OPADD #aff T ESX #code ;
+    #aff {
+        do
+            call ESX^isAffectable.setAffectable(false);
+        end
+    }
     #code {
         do
-          ESX^code := "";--ESX^machine.genExprValeur(T^code, OPADD^code) + ESX1^code; -- XXX si T est une valeur ? ne pas faire le LOADI ?
+          ESX^code := T^code + ESX1^code + OPADD^code; -- XXX si T est une valeur ? ne pas faire le LOADI ?
         end
     }
 
@@ -1134,15 +1183,20 @@ OPADD -> ou #code ;
 T ->  F TX #code ;
     #code {
         do
-          T^code := "";--T^machine.genExprValeur(F^code, TX^code); -- XXX
+          T^code := F^code + TX^code; -- XXX
         end
     }
 
 -- multiplication, ... ----------------------------------------------------------------------------
-TX ->   OPMUL F TX #code ;
+TX ->   OPMUL #aff F TX #code ;
+    #aff {
+        do
+            call TX^isAffectable.setAffectable(false);
+        end
+    }
     #code {
         do
-          TX^code := "";--TX^machine.genExprValeur(F^code, OPMUL^code) + TX1^code; -- XXX
+          TX^code := F^code + TX1^code + OPMUL^code; -- XXX
         end
     }
 
@@ -1181,7 +1235,6 @@ OPMUL -> et #code ;
         end
     }
 
-
 -- expressions de base ----------------------------------------------------------------------------
 F -> entier #code ;
     #code {
@@ -1205,17 +1258,22 @@ F -> faux #code ;
     }
 
 -- unaire -----------------------------------------------------------------------------------------
-F ->  OPUN F #code ;
+F ->  OPUN #aff F #code ;
+    #aff {
+        do
+            call F^isAffectable.setAffectable(false);
+        end
+    }
     #code {
         do
-          F^code := "";-- F^machine.genExprValeur(F1^code, OPUN^code); -- XXX
+          F^code := F1^code + OPUN^code; -- XXX
         end
     }
     
 OPUN -> plus #code ;
     #code {
         do
-          OPUN^code := OPUN^machine.genPlusInt(); -- XXX a verif
+          OPUN^code := OPUN^machine.genPlusInt();
         end
     }
     
@@ -1241,7 +1299,12 @@ F -> nil #code ;
         end
     }
 
-F ->  paro E parf #code ;
+F ->  paro #aff E parf #code ;
+    #aff {
+        do
+            E^isAffectable := F^isAffectable;
+        end
+    }
     #code {
         do
           F^code := E^code;
@@ -1252,7 +1315,7 @@ F ->  paro E parf #code ;
 F -> nouveau  TYPE paro ARGS parf #code ;
     #code {
         do
-          F^code := ""; -- TODO
+          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
         end
     }
     
@@ -1275,7 +1338,7 @@ F -> this #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          F^code := ""; -- TODO
+          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
         end
     }
     
@@ -1303,12 +1366,12 @@ F ->  super  #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          F^code := ""; -- TODO
+          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
         end
     }
     
 -- acces variable ou methode ----------------------------------------------------------------------
-F ->  ident #ismethode #tdsmcourante Q #code ;
+F ->  ident #ismethode #aff #tdsmcourante Q #code ;
     global 
         ismethode : Boolean;
     #ismethode {
@@ -1326,6 +1389,14 @@ F ->  ident #ismethode #tdsmcourante Q #code ;
 	            Q^ismethode := false; --on considere s=nil !!
 	        end
 	    end
+    }
+    #aff {
+        do
+            if ismethode then
+                call F^isAffectable.setAffectable(false);
+            else
+            end
+        end
     }
     #tdsmcourante {
 	    local
@@ -1381,7 +1452,7 @@ F ->  ident #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          F^code := ""; -- TODO
+          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
         end
     }
     
@@ -1402,9 +1473,11 @@ Q ->  #ismethode #code ;
     }
 
 -- acces attribut ou methode ----------------------------------------------------------------------
-Q ->  pt ident #ismethode #tdsmcourante Q #code ;
+Q ->  pt ident #ismethode #aff  #tdsmcourante Q #code ;
+    
     global 
         ismethode : Boolean;
+
     #ismethode {
 	    local 
 	        i:INFO;
@@ -1435,6 +1508,16 @@ Q ->  pt ident #ismethode #tdsmcourante Q #code ;
 	        end
 	    end
     }
+    
+   #aff {
+        do
+            if ismethode then
+                call Q^isAffectable.setAffectable(false);
+            else
+            end
+        end
+    }
+                
     #tdsmcourante {
 	    local
 	        l:List<Signature>;
@@ -1513,12 +1596,18 @@ Q ->  pt ident #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          Q^code := Q1^code; -- XXX
+          Q^code := "\t\t;NOT IMPLEMENTED\n" + Q1^code; -- TODO
         end
     }
 
 -- arguments d'appel de methode -------------------------------------------------------------------
-Q ->  paro ARGS parf #ismethode #tdsmcourante Q #code ;
+Q ->  paro #aff ARGS parf #ismethode #tdsmcourante Q #code ;
+    #aff {
+        do
+            call Q^isAffectable.setAffectable(false);
+            ARGS^isAffectable := Q^isAffectable; --auto par egg
+        end
+    }
     #ismethode {
 	    do
 	        if Q^ismethode then
@@ -1537,7 +1626,7 @@ Q ->  paro ARGS parf #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          Q^code := ARGS^code + Q1^code; -- XXX
+          Q^code := ARGS^code + Q1^code;
         end
     }
     
