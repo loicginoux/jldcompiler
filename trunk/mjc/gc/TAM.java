@@ -1,8 +1,7 @@
 package mjc.gc;
 
 import mjc.tdm.TDM;
-import mjc.tds.INFO;
-import mjc.tdt.TDT;
+import mjc.tds.TDS;
 
 
 public class TAM extends AbstractMachine {
@@ -17,6 +16,12 @@ public class TAM extends AbstractMachine {
 	 */
 	public String genLabel(String label) {
 		return label + "_" + n++;
+	}
+	
+	public String genLinkage(String code, String className) {
+		return "\tJUMP _start\n" + code + "_start\n"
+				+ "\tCALL (LB) " + className + "_main_\n"
+				+ "\tHALT\n";
 	}
 	
 	/*
@@ -89,6 +94,15 @@ public class TAM extends AbstractMachine {
 				"\n\tLOADI (1)\t; on charge la valeur\n" +
 				op;
 	}
+    
+    public String genExprIdent(TDS tds, String ident) {
+    	String code;
+    	if (tds.chercherGlobalement(ident).isAttribute()) 
+    		code = "\t;NOT YET IMPLANTED ";
+    	else
+    		code = "LOADA " + tds.chercherGlobalement(ident).getDep() + " [LB]"; 
+    	return "\t" + code + "\n";
+    }
     
     public String genDefMethode(String nomMethode) {
     	return nomMethode + "\n";

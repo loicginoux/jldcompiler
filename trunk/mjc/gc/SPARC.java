@@ -1,6 +1,7 @@
 package mjc.gc;
 
 import mjc.tdm.TDM;
+import mjc.tds.TDS;
 
 public class SPARC extends AbstractMachine {
 @Override
@@ -31,6 +32,14 @@ public String genSyso() {
 	public String genDefMethode(String nomMethode) {
     	return "";
     }
+	
+	public String genExprIdent(TDS tds, String ident) {
+		return "";
+    }
+	
+	public String genLinkage(String code, String className) {
+		return "";
+	}
 	
 	public String genTrue() {
 		return "";

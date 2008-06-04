@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 
 import mjc.compiler.MJCException;
 import mjc.tdm.TDM;
+import mjc.tds.TDS;
 
 public abstract class AbstractMachine {
 	public abstract String getSuffixe();
@@ -26,6 +27,8 @@ public abstract class AbstractMachine {
 	public abstract String genWhile(String condition, String bloc);
 	public abstract String genReturn(String nomMethode, TDM tdm);
 	public abstract String genDefMethode(String nomMethode);
+	public abstract String genExprIdent(TDS tds, String ident);
+	public abstract String genLinkage(String code, String className);
 	public abstract String genTrue();
     public abstract String genFalse();
     public abstract String genNull();
