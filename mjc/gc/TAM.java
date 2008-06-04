@@ -71,6 +71,9 @@ public class TAM extends AbstractMachine {
     	System.out.println(nomMethode);
     	Boolean isVoid = tdm.chercherGlobalement(nomMethode).getRetour() == null;
     	int size = tdm.chercherGlobalement(nomMethode).getParams().size();
+    	// XXX : reflechir au statique
+    	if (!tdm.chercherGlobalement(nomMethode).isStatique()) // si metode non statique, ajouter le this passé en paramètre
+    		size++;
     	int sizeRet;
     	if (isVoid)
     		sizeRet = 0;
@@ -86,6 +89,10 @@ public class TAM extends AbstractMachine {
 				"\n\tLOADI (1)\t; on charge la valeur\n" +
 				op;
 	}
+    
+    public String genDefMethode(String nomMethode) {
+    	return nomMethode + "\n";
+    }
     
     public static String genLoadL(String value){
     	return "\tLOADL " + value + "\n";
