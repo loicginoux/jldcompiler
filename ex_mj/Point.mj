@@ -35,6 +35,9 @@ class Point {
   public void init (int xi,int yi) {
     x = xi;
     y = yi;
+    8*y+5 = 8;
+    if(y==0){
+    }
     }
         
   public void xtrans(int d){

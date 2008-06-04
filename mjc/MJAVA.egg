@@ -396,6 +396,7 @@ DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 		        call i.setStatique(DEF^visibilitySyn.getDroite());
 		        call i.setVisibility(DEF^visibilitySyn.getGauche());
 		        call i.setType(TYPE^nom);
+                call i.setIsAttribute(true);
 		        call DEF^tds.inserer(ident^txt, i);
                 
                 ---deplacement
