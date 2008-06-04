@@ -43,12 +43,12 @@ public class TAM extends AbstractMachine {
     	String et1 = genEtiq();
     	String res;
     	if (codeBloc2.equals("")) {
-    		res = "\tJUMPIF(0) " + et1 + ";si \n" + 
+    		res = "\tJUMPIF(0) " + et1 + "\t;si\n" + 
     				codeBloc1 +
     				et1 + "\t;fin si\n";
     	} else {
     		String et2 = genEtiq();
-    		res = "\tJUMPIF(0) " + et1 + ";si \n" + 
+    		res = "\tJUMPIF(0) " + et1 + "\t;si\n" + 
 		        	codeBloc1 + 
 		        	"\tJUMP " + et2 + "\n" + 
 		        	et1 + "\t;sinon\n" + 
@@ -62,9 +62,9 @@ public class TAM extends AbstractMachine {
 		String startWhile = genEtiq();
 		String endWhile = genEtiq();
 
-		return startWhile + "\n" + condition + "\t" + "JUMPIF (0) "
-				+ endWhile + "\n" + bloc + "\t" + "JUMP " + startWhile + "\n"
-				+ endWhile + "\n";
+		return startWhile + "\n" + condition + "\t" + "JUMPIF (0) " + endWhile + "\t;while\n"
+				+ "\n" + bloc + "\t" + "JUMP " + startWhile + "\n"
+				+ endWhile + "\t;fin while\n";
 	}
     
     public String genReturn(String nomMethode, TDM tdm) {
@@ -108,7 +108,7 @@ public class TAM extends AbstractMachine {
 	}
     
     public String genNull() {
-		return "\tLOADL 0\n";
+		return "\tSUBR MVoid\n";
 	}
     
     public String genInt(String i) {

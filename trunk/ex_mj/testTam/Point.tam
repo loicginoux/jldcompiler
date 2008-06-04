@@ -3,36 +3,52 @@
 
 	;constructeur Point
 Point_Point_intboolintint
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
 
 	RETURN (1) 5	;on quitte Point_intboolintint
 
 	;methode getx
 Point_getx_
+		;NOT IMPLEMENTED
 	RETURN (1) 1	;on quitte getx_
 
 
 	;methode transcomplexe
 Point_transcomplexe_int
 
-	JUMPIF(0) X2;si 
+		;NOT IMPLEMENTED
+	JUMPIF(0) X2	;si
 
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
 
 X0
-	JUMPIF (0) X1
+		;NOT IMPLEMENTED
+	JUMPIF (0) X1	;while
 
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
+
+		;NOT IMPLEMENTED
 
 	JUMP X0
-X1
+X1	;fin while
 
 
 	JUMP X3
 X2	;sinon
+	LOADL 1
+	SUBR INeg 
 
+		;NOT IMPLEMENTED
 	SUBR SOut
 
 X3	;fin si
@@ -41,10 +57,20 @@ X3	;fin si
 	RETURN (0) 2	;on quitte transcomplexe_int
 
 
+	;methode getMoi
+Point_getMoi_
+		;NOT IMPLEMENTED
+	RETURN (1) 1	;on quitte getMoi_
+
+
 	;methode main
 Point_main_
 
+		;NOT IMPLEMENTED
 
+		;NOT IMPLEMENTED
+
+		;NOT IMPLEMENTED
 	SUBR SOut
 
 	RETURN (0) 0	;on quitte main_
