@@ -17,6 +17,7 @@ public class INFO implements Serializable {
 	private int visibility;
 	private boolean statique;
 	private String type;
+	private boolean isAttribute=false;
 
 
 	public int getDep() {
@@ -63,5 +64,13 @@ public class INFO implements Serializable {
 		else stat="dynamic";
 		
 		return "INFO : " + visi + " " + stat + " " + type + " dep : "+ dep; 
+	}
+
+	public boolean isAttribute() {
+		return isAttribute;
+	}
+
+	public void setAttribute(boolean isAttribute) {
+		this.isAttribute = isAttribute;
 	}
 }
