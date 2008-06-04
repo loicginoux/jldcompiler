@@ -1069,11 +1069,12 @@ AFFX ->  #aff affect ER #code ;
             else
                 error(B_15);
             end
+            call AFFX^isAffectable.setAffectable(false);
         end
     }
 	#code {
 		do
-		    AFFX^code := ER^code; -- XXX
+		    AFFX^code := ER^code + AFFX^machine.genStore(); -- XXX
 		end
 	}
 
@@ -1095,7 +1096,8 @@ ER ->   ES ERX #code ;
 ES ->  T ESX #code ;
     #code {
         do
-            ES^code := T^code + ESX^code; -- XXX
+                ES^code := T^code + ESX^code; -- XXX
+
         end
     }
 
@@ -1472,8 +1474,16 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
 	    end
     }
     #code {
+        local 
+            code : String;
         do
-          F^code := F^machine.genExprIdent(F^tds, ident^txt);
+          code := F^machine.genExprIdent(F^tds, ident^txt);
+          if F^isAffectable.isAffectable() then
+            F^code := code;
+          else
+            -- on le charge
+            F^code := code + F^machine.genLoadI(ident^txt);
+          end
         end
     }
     

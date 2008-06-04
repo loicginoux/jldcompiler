@@ -25,7 +25,7 @@ class Point {
 
     
   public void setx(int l) {
-    x = l;
+    x = (l=3);
     }
     
   public void sety(int l) {
@@ -35,7 +35,7 @@ class Point {
   public void init (int xi,int yi) {
     x = xi;
     y = yi;
-    8*y+5 = 8;
+    y = 8;
     if(y==0){
     }
     }

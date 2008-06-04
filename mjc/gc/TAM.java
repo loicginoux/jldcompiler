@@ -101,16 +101,13 @@ public class TAM extends AbstractMachine {
     		code = "\t;NOT YET IMPLANTED ";
     	else
     		code = "LOADA " + tds.chercherGlobalement(ident).getDep() + " [LB]"; 
-    	return "\t" + code + "\n";
+    	return "\t" + code + "; @ "+ident+"\n";
     }
     
     public String genDefMethode(String nomMethode) {
     	return nomMethode + "\n";
     }
-    
-    public String genStore() {
-		return "";
-	}
+
     
     public static String genLoadL(String value){
     	return "\tLOADL " + value + "\n";
@@ -213,5 +210,15 @@ public class TAM extends AbstractMachine {
     public String getSuffixe() {
 		return "tam";
 	}
+    
+    @Override
+    public String genLoadI(String ident) {
+    	return "\tLOADI (1) ;val " +ident+"\n";
+    }
+    
+    @Override
+    public String genStore() {
+    	return "\tSTOREI(1)\n";
+    }
 
 }

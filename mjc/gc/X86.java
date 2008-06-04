@@ -4,6 +4,11 @@ import mjc.tdm.TDM;
 import mjc.tds.TDS;
 
 public class X86 extends AbstractMachine {
+    @Override
+    public String genLoadI(String ident) {
+    	return "\tLOADI (1) ;val " +ident+"\n";
+    }
+
 @Override
 public String genSyso() {
 	// TODO Auto-generated method stub
