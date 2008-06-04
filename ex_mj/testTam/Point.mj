@@ -54,7 +54,7 @@ class Point {
 	public static void main(){
 		Point p;
 		p = new Point(2,3*5+7);
-		
+		p.getx();
 		syso(p.getx());
 	}
 	

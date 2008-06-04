@@ -439,7 +439,7 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
 	                write(ident^txt+" statique : pas encore traite a donf\n");
-	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	                BLOC^tds := tds; --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
 	            else
 	                i := new INFO();
 	                call i.setType(DEF^tdt.getClassname());
@@ -532,7 +532,7 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
 	                write(ident^txt+" statique : pas encore traite a donf\n");
-	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	                BLOC^tds := tds; --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
 	            else
 	                i := new INFO();
 	                call i.setType(DEF^tdt.getClassname());
@@ -616,7 +616,7 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
 	                write(ident^txt+" statique : pas encore traite a donf\n");
-	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	                BLOC^tds := tds; --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
 	            else
 	                i := new INFO();
 	                call i.setType(DEF^tdt.getClassname());
@@ -1348,6 +1348,8 @@ F ->  ident #ismethode #tdsmcourante Q #code ;
 	                classname := s.getRetour();
 	                maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
 	                
+                    
+                    
 	                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
 	                    Q^tdmcourante := nil;
 	                    Q^tdscourante := nil;
