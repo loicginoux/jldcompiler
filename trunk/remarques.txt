@@ -6,7 +6,8 @@ surcharge de fonction
 appel dynamique
 attributs statique
 methode statique tds a completer
-deplacement pour les classes etandues compter le super
 pop le retour quand il n'est pas utilise
+return pour les statiques plus complexe
+
 
 
