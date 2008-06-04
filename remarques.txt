@@ -7,6 +7,6 @@ appel dynamique
 attributs statique
 methode statique tds a completer
 deplacement pour les classes etandues compter le super
-pop le retour quand il n'est pas utiliser
+pop le retour quand il n'est pas utilise
 
 

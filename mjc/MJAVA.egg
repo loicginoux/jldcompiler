@@ -9,17 +9,16 @@ option k=3;
 -- les attributs semantiques ----------------------------------------------------------------------
 inh source : MJAVASourceFile for PROGRAMME;
 
-inh tds : TDS for  DEFCLASSE, EXTENSION, DEFS, DEF,BLOC,INSTS,INST,SIX,PARFSX, PARFS, PARF,E,ER,AFFX
-,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX;
-
-inh tdm : TDM for DEFCLASSE, EXTENSION, DEFS, DEF, INST, INSTS, BLOC,SIX,PARFSX, PARFS, PARF,E,ER,AFFX
-,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX;
+inh tds : TDS for DEFCLASSE, EXTENSION, DEFS, DEF,BLOC,INSTS,INST,SIX,PARFSX, PARFS, PARF, E, ER,
+                  AFFX ,ES, T, F, Q, ERX, ESX, TX, ARGS, ARGSX;
+inh tdm : TDM for DEFCLASSE, EXTENSION, DEFS, DEF, INST, INSTS, BLOC,SIX,PARFSX, PARFS, PARF, E,
+                  ER,AFFX,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX;
 
 syn params : List<String> for PARFS, PARFSX;
 syn param : String for PARF;
 
-inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF,E,ER,AFFX
-,ES,T,F,Q,ERX,ESX,TX,ARGS,ARGSX,INSTS, INST, BLOC, SIX;
+inh tdt : TDT for DEFCLASSE, EXTENSION, DEF, DEFS, PARFSX, PARFS, PARF, E, ER, AFFX, ES, T, F,
+                  Q, ERX, ESX, TX, ARGS, ARGSX, INSTS, INST, BLOC, SIX;
 
 syn tdts : List<TDT> for IMPORTS;
 
@@ -34,7 +33,7 @@ inh tdmcourante : TDM for Q;
 
 
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
-                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX;
+                        OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX, Q, ARGS, ARGSX;
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
@@ -209,8 +208,6 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 
 -- definition d'une classe ------------------------------------------------------------------------
 DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
-
-
 	#tdt {
 		local 
 		    type : Type;
@@ -229,21 +226,19 @@ DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
 		    call DEFCLASSE^tdm.setClassname(ident^txt);
 		end
 	}
-    
     #attdep {
-    local
-        t:Type;
-    do
-        --- savoir si la classe est etendu
-        t := DEFCLASSE^tdt.getMonType();
-        if t.getClassExtends()=nil then
-            DEFS^depatt := 0; 
-        else
-            DEFS^depatt := 1; -- pour le super
-        end
-    end
+	    local
+	        t:Type;
+	    do
+	        --- savoir si la classe est etendu
+	        t := DEFCLASSE^tdt.getMonType();
+	        if t.getClassExtends()=nil then
+	            DEFS^depatt := 0; 
+	        else
+	            DEFS^depatt := 1; -- pour le super
+	        end
+	    end
     }
-    
 	#code {
 		do
 		    DEFCLASSE^code := ";classe "+ ident^txt + "\n" + DEFS^code;
@@ -308,13 +303,11 @@ DEFS ->  DEFQUAL #tdsVis DEF #dep DEFS  #code ;
 		    DEF^visibilitySyn := DEFQUAL^visibility;
 		end
 	}
-    
     #dep {
-    do
-        DEFS1^depatt := DEFS^depatt + DEF^tailleatt;
-    end
+	    do
+	        DEFS1^depatt := DEFS^depatt + DEF^tailleatt;
+	    end
     }
-    
 	#code {
 		do
 		    DEFS^code := DEF^code + "\n" + DEFS1^code;
@@ -418,11 +411,10 @@ DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 		    -- de declarer et d'initiliser en meme temps un attribut
 		end
 	}
-    
     #tailleatt {
-    do
-        DEF^tailleatt := 1;
-    end
+	    do
+	        DEF^tailleatt := 1;
+	    end
     }
 
 -- methode (fonction) -----------------------------------------------------------------------------
@@ -438,39 +430,38 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
             PARFS^dep := -1;
 	    end
     }
-    
     #tdsap {
-    local 
-        i:INFO;
-        s:Signature;
-    do
-            ---- passage du this ou non -----
-            if DEF^visibilitySyn.getDroite() then
-                write(ident^txt+" statique : pas encore traite a donf\n");
-                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
-            else
-                i := new INFO();
-                call i.setType(DEF^tdt.getClassname());
-                call tds.inserer("this",i); --ajout du this 
-                BLOC^tds := tds;
-                
-                --deplacement
-                    ---choper la methode
-                    s := new Signature();
-                    call s.ajouter(PARFS^params);
-                    s := DEF^tdm.get(ident^txt + "_" + s.getStringParams());
-                    call i.setDep(-1-s.size());
-                ------------------------
-                
-               
-            end
-            ----------------------------------
-    end
+	    local 
+	        i:INFO;
+	        s:Signature;
+	    do
+	            ---- passage du this ou non -----
+	            if DEF^visibilitySyn.getDroite() then
+	                write(ident^txt+" statique : pas encore traite a donf\n");
+	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	            else
+	                i := new INFO();
+	                call i.setType(DEF^tdt.getClassname());
+	                call tds.inserer("this",i); --ajout du this 
+	                BLOC^tds := tds;
+	                
+	                --deplacement
+	                    ---choper la methode
+	                    s := new Signature();
+	                    call s.ajouter(PARFS^params);
+	                    s := DEF^tdm.get(ident^txt + "_" + s.getStringParams());
+	                    call i.setDep(-1-s.size());
+	                ------------------------
+	                
+	               
+	            end
+	            ----------------------------------
+	    end
     }
     #dep {
-    do
-        BLOC^dep := 0;
-    end
+	    do
+	        BLOC^dep := 0;
+	    end
     }
     #tdt {
 		local
@@ -502,9 +493,9 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
 		end
 	}
     #tailleatt {
-    do
-        DEF^tailleatt := 0;
-    end
+	    do
+	        DEF^tailleatt := 0;
+	    end
     }
 	#code {
 		do
@@ -532,36 +523,36 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 	    end
     }
     #tdsap {
-    local 
-        i:INFO;
-        s2:Signature;
-    do
-            ---- passage du this ou non -----
-            if DEF^visibilitySyn.getDroite() then
-                write(ident^txt+" statique : pas encore traite a donf\n");
-                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
-            else
-                i := new INFO();
-                call i.setType(DEF^tdt.getClassname());
-                call tds.inserer("this",i); --ajout du this 
-                BLOC^tds := tds;
-                
-                --deplacement
-                    ---choper la methode
-                    s2 := new Signature();
-                    call s2.ajouter(PARFS^params);
-                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
-                    call i.setDep(-1-s2.size());
-                ------------------------
-            end
-            ----------------------------------
-           
-    end
+	    local 
+	        i:INFO;
+	        s2:Signature;
+	    do
+	            ---- passage du this ou non -----
+	            if DEF^visibilitySyn.getDroite() then
+	                write(ident^txt+" statique : pas encore traite a donf\n");
+	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	            else
+	                i := new INFO();
+	                call i.setType(DEF^tdt.getClassname());
+	                call tds.inserer("this",i); --ajout du this 
+	                BLOC^tds := tds;
+	                
+	                --deplacement
+	                    ---choper la methode
+	                    s2 := new Signature();
+	                    call s2.ajouter(PARFS^params);
+	                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
+	                    call i.setDep(-1-s2.size());
+	                ------------------------
+	            end
+	            ----------------------------------
+	           
+	    end
     }
     #dep {
-    do
-        BLOC^dep := 0;
-    end
+	    do
+	        BLOC^dep := 0;
+	    end
     }
 	#tdm {
 		local
@@ -589,9 +580,9 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 		end
 	}
     #tailleatt {
-    do
-        DEF^tailleatt := 0;
-    end
+	    do
+	        DEF^tailleatt := 0;
+	    end
     }
     #debug {
 	    do
@@ -614,36 +605,36 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
 	    end
     }
     #tdsap {
-    local 
-        i:INFO;
-        s2:Signature;
-    do
-    
-            ---- passage du this ou non -----
-            if DEF^visibilitySyn.getDroite() then
-                write(ident^txt+" statique : pas encore traite a donf\n");
-                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
-            else
-                i := new INFO();
-                call i.setType(DEF^tdt.getClassname());
-                call tds.inserer("this",i); --ajout du this 
-                BLOC^tds := tds;
-                
-                --deplacement
-                    ---choper la methode
-                    s2 := new Signature();
-                    call s2.ajouter(PARFS^params);
-                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
-                    call i.setDep(-1-s2.size());
-                ------------------------
-            end
-            ----------------------------------
-    end
+	    local 
+	        i:INFO;
+	        s2:Signature;
+	    do
+	    
+	            ---- passage du this ou non -----
+	            if DEF^visibilitySyn.getDroite() then
+	                write(ident^txt+" statique : pas encore traite a donf\n");
+	                BLOC^tds := new TDS(); --XXX ajouter les att&meth stat
+	            else
+	                i := new INFO();
+	                call i.setType(DEF^tdt.getClassname());
+	                call tds.inserer("this",i); --ajout du this 
+	                BLOC^tds := tds;
+	                
+	                --deplacement
+	                    ---choper la methode
+	                    s2 := new Signature();
+	                    call s2.ajouter(PARFS^params);
+	                    s2 := DEF^tdm.get(ident^txt + "_" + s2.getStringParams());
+	                    call i.setDep(-1-s2.size());
+	                ------------------------
+	            end
+	            ----------------------------------
+	    end
     }
-    #dep{
-    do
-        BLOC^dep := 0;
-    end
+    #dep {
+	    do
+	        BLOC^dep := 0;
+	    end
     }
 	#tdm {
 		local
@@ -664,9 +655,9 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
 		end
 	}
     #tailleatt {
-    do
-        DEF^tailleatt := 0;
-    end
+	    do
+	        DEF^tailleatt := 0;
+	    end
     }
 	#code {
 		do
@@ -674,7 +665,6 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
                         DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
 		end
 	}
-    
     #debug {
 	    do
 	       -- write("tds de "+ident^txt+" : "+tds);
@@ -689,11 +679,10 @@ DEF -> DEFCLASSE #code #tailleatt;
             error(B_INT); --non traite
 		end
 	}
-    
     #tailleatt {
-    do
-        DEF^tailleatt := 0;
-    end
+	    do
+	        DEF^tailleatt := 0;
+	    end
     }
 
 -- les types --------------------------------------------------------------------------------------
@@ -731,12 +720,11 @@ PARFSX -> #params  ;
 
 PARFSX -> virg  #dep PARF  PARFSX #params ;
     #dep {
-    do
-        PARF^dep := PARFSX^dep -1;
-        PARFSX1^dep := PARFSX^dep -1;
-    end
+	    do
+	        PARF^dep := PARFSX^dep -1;
+	        PARFSX1^dep := PARFSX^dep -1;
+	    end
     }
-    
 	#params {
 		do
 		    call PARFSX1^params.add(PARF^param);
@@ -752,9 +740,7 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 		    t := PARF^tdt.chercherLocalement(TYPE^nom);
 		    if t = nil then  error(B_04, TYPE^nom); --type inconnu ds les import
 		    else
-		    end 
-            
-            
+		    end
 		end
 	}
 	#param {
@@ -783,20 +769,19 @@ PARF ->  TYPE ident #tdt #param #tds  ;
 -- corps de methode et bloc d'instructions --------------------------------------------------------
 BLOC ->  aco #dep INSTS acf #code #debug;
     #dep {
-    do
-        INSTS^dep := BLOC^dep;
-    end
+	    do
+	        INSTS^dep := BLOC^dep;
+	    end
     }
 	#code {
 		do
 		    BLOC^code := INSTS^code;
 		end
 	}
-    
     #debug {
-    do
-    write("tdsbloc : "+BLOC^tds+"\n");
-    end
+	    do
+	       write("tdsbloc : "+BLOC^tds+"\n");
+	    end
     }
 
 -- instructions -----------------------------------------------------------------------------------
@@ -807,26 +792,26 @@ INSTS ->  #code #taille ;
 		end
 	}
     #taille {
-    do
-        INSTS^taille := 0;
-    end
+	    do
+	        INSTS^taille := 0;
+	    end
     }
 
 INSTS -> #dep2  INST #dep INSTS #taille #code  ;
     #dep2 {
-    do
-        INST^dep := INSTS^dep; --auto par egg
-    end
+	    do
+	        INST^dep := INSTS^dep; --auto par egg
+	    end
     }
     #dep {
-    do 
-        INSTS1^dep := INSTS^dep + INST^taille;
-    end
+	    do 
+	        INSTS1^dep := INSTS^dep + INST^taille;
+	    end
     }
     #taille {
-    do
-        INSTS^taille := INST^taille + INSTS1^taille;
-    end
+	    do
+	        INSTS^taille := INST^taille + INSTS1^taille;
+	    end
     }
 	#code {
 		do
@@ -846,7 +831,6 @@ INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
             end 
         end
     }
-    
     #tds { --seulement apres l'affectation car on ne connait pas sa propre declaration !!!
         local 
             i:INFO;
@@ -867,9 +851,9 @@ INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
         end
     }
     #taille {
-    do
-        INST^taille := 1;  --car TYPE^taille = 1 tout le temps !!
-    end
+	    do
+	        INST^taille := 1;  --car TYPE^taille = 1 tout le temps !!
+	    end
     }
 	#code {
 		do
@@ -877,16 +861,13 @@ INST->  TYPE #tdt ident AFFX #tds pv #taille #code ;
 		end
 	}
     
-    
-
 -- instruction expression -------------------------------------------------------------------------
 INST ->  E pv #taille #code ;
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
-    
 	#code {
 		do
 		    INST^code := E^code;
@@ -901,14 +882,14 @@ INST -> #tds #dep BLOC #taille #code  ;
 	    end
     }
     #dep {
-    do
-        BLOC^dep := INST^dep;
-    end
+	    do
+	        BLOC^dep := INST^dep;
+	    end
     }
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
 	#code {
 		do
@@ -925,15 +906,15 @@ INST ->  si paro E parf #tds #dep BLOC SIX #taille #code ;
 	    end
     }
     #dep {
-    do
-        BLOC^dep := INST^dep;
-        SIX^dep := INST^dep;
-    end
+	    do
+	        BLOC^dep := INST^dep;
+	        SIX^dep := INST^dep;
+	    end
     }
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
 	#code {
 		do
@@ -949,9 +930,9 @@ SIX ->   sinon #tds #dep BLOC #code ;
 	    end
     }
     #dep {
-    do
-        BLOC^dep := SIX^dep;
-    end
+	    do
+	        BLOC^dep := SIX^dep;
+	    end
     }
 	#code {
 		do
@@ -969,9 +950,9 @@ SIX -> #code ;
 -- return -----------------------------------------------------------------------------------------
 INST ->  retour E pv #taille #code ;
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
 	#code {
 		do
@@ -987,14 +968,14 @@ INST ->  tantque paro E parf #tds #dep BLOC #taille #code ;
 	    end
     }
     #dep {
-    do
-        BLOC^dep := INST^dep;
-    end
+	    do
+	        BLOC^dep := INST^dep;
+	    end
     }
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
 	#code {
 		do
@@ -1005,14 +986,14 @@ INST ->  tantque paro E parf #tds #dep BLOC #taille #code ;
 -- le sysout ---------------------------------------------------------------------------------------
 INST -> syso paro E parf pv #taille #code;
     #taille {
-    do
-        INST^taille := 0;
-    end
+	    do
+	        INST^taille := 0;
+	    end
     }
     #code {
-    do
-        INST^code := E^code + INST^machine.genSyso();
-    end
+	    do
+	        INST^code := E^code + INST^machine.genSyso();
+	    end
     }
 
 -- les expressions --------------------------------------------------------------------------------
@@ -1270,285 +1251,315 @@ F -> nouveau  TYPE paro ARGS parf #code ;
         end
     }
     
--- this 
+-- this -------------------------------------------------------------------------------------------
 F -> this #ismethode #tdsmcourante Q #code ;
     #ismethode {
-    do
-        Q^ismethode := false;
-    end
+	    do
+	        Q^ismethode := false;
+	    end
     }
-    
     #tdsmcourante {
-    local
-        classname : String;
-    do
-        classname := F^tdm.getClassname();
-        Q^tdscourante := F^tds.getPlusHaute(); --plus haute sans remonter les extends !!!!
-        Q^tdmcourante := F^tdm;
-        
-    end
+	    local
+	        classname : String;
+	    do
+	        classname := F^tdm.getClassname();
+	        Q^tdscourante := F^tds.getPlusHaute(); --plus haute sans remonter les extends !!!!
+	        Q^tdmcourante := F^tdm;
+	        
+	    end
     }
-      
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- appel super 
+-- appel super ------------------------------------------------------------------------------------
 F ->  super  #ismethode #tdsmcourante Q #code ;
      #ismethode {
-    do
-        Q^ismethode := false;
-    end
+	    do
+	        Q^ismethode := false;
+	    end
     }
-    
     #tdsmcourante {
-    local
-        i : INFO;
-        fac : Factory;
-    do
-        fac := new Factory();
-        i := F^tds.chercherGlobalement("super");
-        if i/=nil then
-            Q^tdscourante := fac.chargerTDS(i.getType());
-            Q^tdmcourante := fac.chargerTDM(i.getType());
-        else
-            error(B_10,"super");
-        end  
-    end
+	    local
+	        i : INFO;
+	        fac : Factory;
+	    do
+	        fac := new Factory();
+	        i := F^tds.chercherGlobalement("super");
+	        if i/=nil then
+	            Q^tdscourante := fac.chargerTDS(i.getType());
+	            Q^tdmcourante := fac.chargerTDM(i.getType());
+	        else
+	            error(B_10,"super");
+	        end  
+	    end
     }
-    
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- acces variable ou methode 
+-- acces variable ou methode ----------------------------------------------------------------------
 F ->  ident #ismethode #tdsmcourante Q #code ;
     global 
         ismethode : Boolean;
     #ismethode {
-    local 
-        i:INFO;
-        s:Signature;
-    do
-        i := F^tds.chercherGlobalement(ident^txt);
-        --s := F^tdm.chercherGlobalement(ident^txt); --XXX
-        if i=nil then
-            ismethode := true;
-            Q^ismethode := true; --on va considerer que oui !
-        else
-            ismethode := false;
-            Q^ismethode := false; --on considere s=nil !!
-        end
-    end
+	    local 
+	        i:INFO;
+	        s:Signature;
+	    do
+	        i := F^tds.chercherGlobalement(ident^txt);
+	        --s := F^tdm.chercherGlobalement(ident^txt); --XXX
+	        if i=nil then
+	            ismethode := true;
+	            Q^ismethode := true; --on va considerer que oui !
+	        else
+	            ismethode := false;
+	            Q^ismethode := false; --on considere s=nil !!
+	        end
+	    end
     }
-    
     #tdsmcourante {
-    local
-        l:List<Signature>;
-        s:Signature;
-        i:INFO;
-        classname : String;
-        maclasse : String;
-        t:Type;
-        fac : Factory;
-    do
-        if ismethode then --si c'est une methode
-            --choper le type de retour de la methode
-            -- on gere pas la surcharge
-            l := F^tdm.chercherGlobalementSansArgs(ident^txt);
-            if (l.isEmpty()) then
-                error(B_10,ident^txt);
-            else
-                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
-                classname := s.getRetour();
-                maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
-                
-                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
-                    Q^tdmcourante := nil;
-                    Q^tdscourante := nil;
-                elseif classname.equals(maclasse) then
-                    Q^tdscourante := F^tds.getPlusHaute();
-                    Q^tdmcourante := F^tdm;
-                else
-                    fac := new Factory();
-                    Q^tdscourante := fac.chargerTDS(classname);
-                    Q^tdmcourante := fac.chargerTDM(classname);
-                end
-            end
-        else
-            i := F^tds.chercherGlobalement(ident^txt);
-            -- c sur c un field
-            classname := i.getType();
-            maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
-            if classname.equals(maclasse) then
-                Q^tdscourante := F^tds.getPlusHaute();
-                Q^tdmcourante := F^tdm;
-            else
-                fac := new Factory();
-                Q^tdscourante := fac.chargerTDS(classname);
-                Q^tdmcourante := fac.chargerTDM(classname);
-            end
-            
-        end
-    end
+	    local
+	        l:List<Signature>;
+	        s:Signature;
+	        i:INFO;
+	        classname : String;
+	        maclasse : String;
+	        t:Type;
+	        fac : Factory;
+	    do
+	        if ismethode then --si c'est une methode
+	            --choper le type de retour de la methode
+	            -- on gere pas la surcharge
+	            l := F^tdm.chercherGlobalementSansArgs(ident^txt);
+	            if (l.isEmpty()) then
+	                error(B_10,ident^txt);
+	            else
+	                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
+	                classname := s.getRetour();
+	                maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
+	                
+	                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
+	                    Q^tdmcourante := nil;
+	                    Q^tdscourante := nil;
+	                elseif classname.equals(maclasse) then
+	                    Q^tdscourante := F^tds.getPlusHaute();
+	                    Q^tdmcourante := F^tdm;
+	                else
+	                    fac := new Factory();
+	                    Q^tdscourante := fac.chargerTDS(classname);
+	                    Q^tdmcourante := fac.chargerTDM(classname);
+	                end
+	            end
+	        else
+	            i := F^tds.chercherGlobalement(ident^txt);
+	            -- c sur c un field
+	            classname := i.getType();
+	            maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
+	            if classname.equals(maclasse) then
+	                Q^tdscourante := F^tds.getPlusHaute();
+	                Q^tdmcourante := F^tdm;
+	            else
+	                fac := new Factory();
+	                Q^tdscourante := fac.chargerTDS(classname);
+	                Q^tdmcourante := fac.chargerTDM(classname);
+	            end
+	            
+	        end
+	    end
     }
-    
     #code {
         do
           F^code := ""; -- TODO
         end
     }
     
--- Q = qualificateur de variable
-Q ->  #ismethode ;
+-- Q = qualificateur de variable ------------------------------------------------------------------
+Q ->  #ismethode #code ;
     #ismethode {
-    do
-        if Q^ismethode then
-            error(B_12);
-        else
+	    do
+	        if Q^ismethode then
+	            error(B_12);
+	        else
+	        end
+	    end
+    }
+    #code {
+        do
+          Q^code := ""; -- XXX
         end
-    end
     }
 
--- acces attribut ou methode
-Q ->  pt ident #ismethode #tdsmcourante Q  ;
+-- acces attribut ou methode ----------------------------------------------------------------------
+Q ->  pt ident #ismethode #tdsmcourante Q #code ;
     global 
         ismethode : Boolean;
     #ismethode {
-    local 
-        i:INFO;
-        s:Signature;
-    do 
-        --- verifier que Q a une table de symbole courante
-        if Q^tdscourante = nil then
-            error(B_14, ident^txt); 
-        else
-        end
-        
-        --- fin verification
-        
-        i := Q^tdscourante.chercherGlobalement(ident^txt);
-        --s := Q^tdmcourante.chercherGlobalement(ident^txt); --XXX
-        if i=nil then
-            ismethode := true;
-            Q1^ismethode := true; --on va considerer que oui !
-        else
-            ismethode := false;
-            Q1^ismethode := false; --on considere s=nil !!
-        end
-        
-        --verifier quon a pas une methode
-        if Q^ismethode then
-            error(B_12);
-        else
-        end
-    end
+	    local 
+	        i:INFO;
+	        s:Signature;
+	    do 
+	        --- verifier que Q a une table de symbole courante
+	        if Q^tdscourante = nil then
+	            error(B_14, ident^txt); 
+	        else
+	        end
+	        
+	        --- fin verification
+	        
+	        i := Q^tdscourante.chercherGlobalement(ident^txt);
+	        --s := Q^tdmcourante.chercherGlobalement(ident^txt); --XXX
+	        if i=nil then
+	            ismethode := true;
+	            Q1^ismethode := true; --on va considerer que oui !
+	        else
+	            ismethode := false;
+	            Q1^ismethode := false; --on considere s=nil !!
+	        end
+	        
+	        --verifier quon a pas une methode
+	        if Q^ismethode then
+	            error(B_12);
+	        else
+	        end
+	    end
     }
-    
     #tdsmcourante {
-    local
-        l:List<Signature>;
-        s:Signature;
-        i:INFO;
-        classname : String;
-        maclasse : String;
-        t:Type;
-        fac : Factory;
-        acces : Integer;
-        classecourante : String;
-    do
-        if ismethode then
-            --choper le type de retour de la methode
-            -- on gere pas la surcharge
-            l := Q^tdmcourante.chercherGlobalementSansArgs(ident^txt);
-            if (l.isEmpty()) then
-                error(B_10,ident^txt);
-            else
-                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
-                classname := s.getRetour();
-                maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
-                
-                ------ gestion du private-----------
-                acces := s.getVisibility();
-                classecourante := Q^tdmcourante.getClassname();
-                if acces=1 then
-                    if classecourante.equals(maclasse) then
-                    else
-                        error(B_13b,ident^txt);  --champs prive
-                    end
-                else
-                end
-                ------ fin gestion -------------
-                
-                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
-                    Q1^tdmcourante := nil;
-                    Q1^tdscourante := nil;
-                elseif classname.equals(maclasse) then
-                    Q1^tdscourante := Q^tds.getPlusHaute();
-                    Q1^tdmcourante := Q^tdm;
-                else
-                    fac := new Factory();
-                    Q1^tdscourante := fac.chargerTDS(classname);
-                    Q1^tdmcourante := fac.chargerTDM(classname);
-                end
-            end
-        else
-             i := Q^tdscourante.chercherGlobalement(ident^txt);
-            -- c sur c un field
-            classname := i.getType();
-            maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
-            
-            ------ gestion du private-----------
-            acces := i.getVisibility();
-            classecourante := Q^tdmcourante.getClassname();
-            if acces=1 then
-                if classecourante.equals(maclasse) then
-                else
-                    error(B_13,ident^txt);  --champs prive
-                end
-            else
-            end
-            ------ fin gestion -------------
-            
-            if classname.equals(maclasse) then
-                Q1^tdscourante := Q^tds.getPlusHaute();
-                Q1^tdmcourante := Q^tdm;
-            else
-                fac := new Factory();
-                Q1^tdscourante := fac.chargerTDS(classname);
-                Q1^tdmcourante := fac.chargerTDM(classname);
-            end
+	    local
+	        l:List<Signature>;
+	        s:Signature;
+	        i:INFO;
+	        classname : String;
+	        maclasse : String;
+	        t:Type;
+	        fac : Factory;
+	        acces : Integer;
+	        classecourante : String;
+	    do
+	        if ismethode then
+	            --choper le type de retour de la methode
+	            -- on gere pas la surcharge
+	            l := Q^tdmcourante.chercherGlobalementSansArgs(ident^txt);
+	            if (l.isEmpty()) then
+	                error(B_10,ident^txt);
+	            else
+	                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
+	                classname := s.getRetour();
+	                maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
+	                
+	                ------ gestion du private-----------
+	                acces := s.getVisibility();
+	                classecourante := Q^tdmcourante.getClassname();
+	                if acces=1 then
+	                    if classecourante.equals(maclasse) then
+	                    else
+	                        error(B_13b,ident^txt);  --champs prive
+	                    end
+	                else
+	                end
+	                ------ fin gestion -------------
+	                
+	                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
+	                    Q1^tdmcourante := nil;
+	                    Q1^tdscourante := nil;
+	                elseif classname.equals(maclasse) then
+	                    Q1^tdscourante := Q^tds.getPlusHaute();
+	                    Q1^tdmcourante := Q^tdm;
+	                else
+	                    fac := new Factory();
+	                    Q1^tdscourante := fac.chargerTDS(classname);
+	                    Q1^tdmcourante := fac.chargerTDM(classname);
+	                end
+	            end
+	        else
+	             i := Q^tdscourante.chercherGlobalement(ident^txt);
+	            -- c sur c un field
+	            classname := i.getType();
+	            maclasse := Q^tdt.getClassname(); --le nom de la classe quon traite
+	            
+	            ------ gestion du private-----------
+	            acces := i.getVisibility();
+	            classecourante := Q^tdmcourante.getClassname();
+	            if acces=1 then
+	                if classecourante.equals(maclasse) then
+	                else
+	                    error(B_13,ident^txt);  --champs prive
+	                end
+	            else
+	            end
+	            ------ fin gestion -------------
+	            
+	            if classname.equals(maclasse) then
+	                Q1^tdscourante := Q^tds.getPlusHaute();
+	                Q1^tdmcourante := Q^tdm;
+	            else
+	                fac := new Factory();
+	                Q1^tdscourante := fac.chargerTDS(classname);
+	                Q1^tdmcourante := fac.chargerTDM(classname);
+	            end
+	        end
+	    end
+    }
+    #code {
+        do
+          Q^code := Q1^code; -- XXX
         end
-    end
     }
 
--- arguments d'appel de methode
-Q ->  paro ARGS parf #ismethode #tdsmcourante Q  ;
+-- arguments d'appel de methode -------------------------------------------------------------------
+Q ->  paro ARGS parf #ismethode #tdsmcourante Q #code ;
     #ismethode {
-    do
-        if Q^ismethode then
-        else
-            error(B_11);
-        end
-        
-        Q1^ismethode := false;
-    end
+	    do
+	        if Q^ismethode then
+	        else
+	            error(B_11);
+	        end
+	        
+	        Q1^ismethode := false;
+	    end
     }
-    
     #tdsmcourante { --XXX gerer la surcharge plus haut PUIS ici
-    do
-        Q1^tdscourante := Q^tdscourante; --auto par egg
-        Q1^tdmcourante := Q^tdmcourante;
-    end
+	    do
+	        Q1^tdscourante := Q^tdscourante; --auto par egg
+	        Q1^tdmcourante := Q^tdmcourante;
+	    end
+    }
+    #code {
+        do
+          Q^code := ARGS^code + Q1^code; -- XXX
+        end
     }
     
-ARGS ->  E ARGSX  ;
-ARGS -> ;
-ARGSX ->   virg E ARGSX  ;
-ARGSX -> ;
+ARGS ->  E ARGSX #code ;
+    #code {
+        do
+          ARGS^code := ARGSX^code + E^code;
+        end
+    }
+    
+ARGS -> #code ;
+    #code {
+        do
+          ARGS^code := "";
+        end
+    }
+    
+ARGSX ->   virg E ARGSX #code ;
+    #code {
+        do
+          ARGSX^code := ARGSX1^code+ E^code;
+        end
+    }
+    
+ARGSX -> #code ;
+    #code {
+        do
+          ARGSX^code := "";
+        end
+    }
 
 end
