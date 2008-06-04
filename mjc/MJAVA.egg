@@ -501,8 +501,7 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
 		do
 		    DEF^code := "\t;methode " + ident^txt + "\n" +
                         DEF^machine.genDefMethode(DEF^tdt.getClassname() +  "_" + ident^txt + "_" + s.getStringParams()) +
-                        BLOC^code + 
-                        DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
+                        BLOC^code;
 		end
 	}
     #debug {
