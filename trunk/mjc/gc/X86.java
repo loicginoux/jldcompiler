@@ -28,6 +28,10 @@ public String genSyso() {
 		return "";
 	}
 	
+	public String genDefMethode(String nomMethode) {
+    	return "";
+    }
+	
 	public String genTrue() {
 		return "";
 	}

@@ -421,7 +421,8 @@ DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 -- methode (fonction) -----------------------------------------------------------------------------
 DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #code #debug;
     global
-        tds:TDS;
+        tds : TDS;
+        s : Signature;
 	#tds {
 	    do
 	        tds := new TDS(DEF^tds);
@@ -434,7 +435,6 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
     #tdsap {
 	    local 
 	        i:INFO;
-	        s:Signature;
 	    do
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
@@ -476,7 +476,6 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
 	}
 	#tdm {
 		local
-		    s : Signature;
 		    stemp : Signature;
 		do
 		    s := new Signature();
@@ -500,7 +499,10 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
     }
 	#code {
 		do
-		    DEF^code := "\t;methode " + ident^txt + "\n" + BLOC^code;
+		    DEF^code := "\t;methode " + ident^txt + "\n" +
+                        DEF^machine.genDefMethode(DEF^tdt.getClassname() +  "_" + ident^txt + "_" + s.getStringParams()) +
+                        BLOC^code + 
+                        DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
 		end
 	}
     #debug {
@@ -575,9 +577,10 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 	}
 	#code {
 		do
-		    DEF^code := "\t;methode " + ident^txt + "\n" + BLOC^code + 
+		    DEF^code := "\t;methode " + ident^txt + "\n" +
+                        DEF^machine.genDefMethode(DEF^tdt.getClassname() +  "_" + ident^txt + "_" + s.getStringParams()) +
+                        BLOC^code + 
                         DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
-            -- TODO  : return. quelle taille ?
 		end
 	}
     #tailleatt {
@@ -662,7 +665,9 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
     }
 	#code {
 		do
-		    DEF^code := "\t;constructeur " + ident^txt + "\n" + BLOC^code + 
+		    DEF^code := "\t;constructeur " + ident^txt + "\n" +
+                        DEF^machine.genDefMethode(DEF^tdt.getClassname() +  "_" + ident^txt + "_" + s.getStringParams()) +
+                        BLOC^code + 
                         DEF^machine.genReturn(ident^txt + "_" + s.getStringParams(), DEF^tdm);
 		end
 	}
