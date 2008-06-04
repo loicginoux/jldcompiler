@@ -396,7 +396,7 @@ DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 		        call i.setStatique(DEF^visibilitySyn.getDroite());
 		        call i.setVisibility(DEF^visibilitySyn.getGauche());
 		        call i.setType(TYPE^nom);
-                call i.setIsAttribute(true);
+                call i.setAttribute(true);
 		        call DEF^tds.inserer(ident^txt, i);
                 
                 ---deplacement
@@ -1037,7 +1037,7 @@ INST -> syso paro #aff E parf pv #taille #code;
 E -> ER  AFFX #code ;
 	#code {
 		do
-		    E^code := "\t\t;NOT IMPLEMENTED\n"; -- E^machine.genExpression(); -- TODO
+		    E^code := ER^code + AFFX^code; -- XXX
 		end
 	}
 
