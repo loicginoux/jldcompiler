@@ -103,7 +103,7 @@ term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
 
 ---------- REGLES DE PRODUCTION -------------------------------------------------------------------
-PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
+PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
     global
        machine : AbstractMachine;
        tds : TDS;
@@ -160,6 +160,26 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv ;
 	        call fac.persister(IMPORTS^code + DEFCLASSE^code, tdt.getClassname() + "_code." + langage);
 	        write "fin sauv\n";
 	    end
+    }
+    #linkage {
+        local
+            fac : Factory;
+            code : String;
+            main : Signature;
+        do
+            fac := new Factory();
+            main := tdm.chercherLocalement("main_");
+            if main /= nil then -- il y a un main
+                if main.isStatique() then
+                    code := machine.genLinkage(IMPORTS^code + DEFCLASSE^code, tdt.getClassname());
+                    call machine.writeCode(PROGRAMME^source.getFileName() + "_exe", code);
+                else
+                    error(B_16);
+                end
+            else
+                -- main pas oblige
+            end
+        end
     }
 
 IMPORTS -> #tdts #code;
@@ -1453,7 +1473,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
     }
     #code {
         do
-          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
+          F^code := F^machine.genExprIdent(F^tds, ident^txt);
         end
     }
     
@@ -1474,7 +1494,7 @@ Q ->  #ismethode #code ;
     }
 
 -- acces attribut ou methode ----------------------------------------------------------------------
-Q ->  pt ident #ismethode #aff  #tdsmcourante Q #code ;
+Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
     
     global 
         ismethode : Boolean;
