@@ -231,8 +231,16 @@ DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
 	}
     
     #attdep {
+    local
+        t:Type;
     do
-        DEFS^depatt := 0; --XXX 1 pour extends pour le super
+        --- savoir si la classe est etendu
+        t := DEFCLASSE^tdt.getMonType();
+        if t.getClassExtends()=nil then
+            DEFS^depatt := 0; 
+        else
+            DEFS^depatt := 1; -- pour le super
+        end
     end
     }
     
@@ -1275,7 +1283,7 @@ F -> this #ismethode #tdsmcourante Q #code ;
         classname : String;
     do
         classname := F^tdm.getClassname();
-        Q^tdscourante := F^tds.getPlusHaute();
+        Q^tdscourante := F^tds.getPlusHaute(); --plus haute sans remonter les extends !!!!
         Q^tdmcourante := F^tdm;
         
     end

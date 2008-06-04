@@ -9,11 +9,6 @@ class Point {
     origine = null;
     }
 
-  public Point(Point autre){
-    x = autre.getx();
-    y = autre.gety();
-    }
-
   public int getx() {
     return x;
     }
@@ -21,6 +16,13 @@ class Point {
   public int gety() {
     return y;
     }
+    
+  public Point(Point autre){
+    x = autre.getx();
+    y = autre.gety();
+    }
+
+
     
   public void setx(int l) {
     x = l;
