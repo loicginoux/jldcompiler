@@ -58,5 +58,6 @@ public abstract class AbstractMachine {
 	public abstract String genCall(String nom);
 	public abstract String genMalloc(int taille,String nomtype);
 	public abstract String genLoadL(String value);
+	public abstract String genPop(int dep,int taille,String commentaire);
 	
 }

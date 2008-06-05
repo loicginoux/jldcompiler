@@ -3,6 +3,10 @@ class Point {
 	private int x;
 	private int y;
 	
+	public Point getMoi(){
+		return this;
+	}
+
 	public Point(int a,int b){
 		x=a;
 		this.y=b;
@@ -46,20 +50,20 @@ class Point {
 		int apif;
 		
 	}
-				
 	
-	private bool z; //definition d'un attribut en plein milieu
-	
-	public Point getMoi(){
-		return this;
+	public void afficher(){
+		syso(this.x);
+		syso(y);
 	}
-
 	
 	public static void main(){
 		Point p;
-		p = new Point(2,3*5+7);
+		p = new Point(2,4);
+		p.afficher();
 		p.x=6;
-		syso(p.getx());
+		p.getMoi().getMoi().afficher();
+	
+		
 	}
 	
 }

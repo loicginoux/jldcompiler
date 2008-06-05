@@ -88,11 +88,37 @@ public class TAM extends AbstractMachine {
     
     public String genExprIdent(TDS tds, String ident) {
     	String code;
-    	if (tds.chercherGlobalement(ident).isAttribute()) 
-    		code = "\t\t;NOT YET IMPLANTED ";
-    	else
-    		code = "LOADA " + tds.chercherGlobalement(ident).getDep() + "[LB]"; 
-    	return "\t" + code + "\t\t; @ "+ident+"\n";
+    	if (tds.chercherGlobalement(ident).isAttribute()){ 
+    		if(tds.isPlusHaute()){
+    			if(tds.chercherLocalement(ident)!=null){
+    				//directement dans la bonne classe
+    				code = genLoadL(tds.chercherLocalement(ident).getDep()+"")+
+    					   genPlus()+ "\t\t; @ "+ident+"\n"; ;
+    			}else{
+    				//fo choper le super
+    				if(tds.chercherLocalement("super")!=null){
+    					code = genExprIdent(tds, "super")+
+    						   genLoadI("super")+ //appel par valeur
+    						   genExprIdent(tds.getParente(), ident);
+    					
+    				}else{
+    					//erreur
+    					code = "\tLOADL \"FATAL ERROR\"\t; pas de super in genexpr\n"+
+    						   genSyso("string");
+    				}
+    			}
+    		}else{
+    			//pas dans une tds de classe donc charger this
+    			code = genExprIdent(tds, "this") + 
+    				   genLoadI("this")+ //appel par valeur
+    				   genExprIdent(tds.getPlusHaute(), ident);
+    		}
+    	}else{
+    		code = "\tLOADA " + tds.chercherGlobalement(ident).getDep() + "[LB]"
+    		+ "\t\t; @ "+ident+"\n"; 
+    	}
+    	
+    	return code;
     }
     
     public String genExprIdent(int dep, String ident) {
@@ -228,9 +254,14 @@ public class TAM extends AbstractMachine {
     	String code;
     	code =genLoadL(taille+"");
     	code +="\tSUBR MAlloc\t\t; new "+nomtype+"\n";
+    	code +="\tLOAD (1) -1[ST]\t\t; reempile this \n";
     	
     	return code;
     	
+    }
+    @Override
+    public String genPop(int dep, int taille, String commentaire) {
+    	return "\tPOP ("+dep+") "+taille+"\t\t; "+commentaire+"\n";
     }
 
 }
