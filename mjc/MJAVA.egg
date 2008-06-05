@@ -1505,6 +1505,8 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
 	        maclasse : String;
 	        t:Type;
 	        fac : Factory;
+            acces : Integer;
+            classecourante : String;
 	    do
 	        if ismethode then --si c'est une methode
 	            --choper le type de retour de la methode
@@ -1517,7 +1519,17 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
 	                classname := s.getRetour();
 	                maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
 	                
-                    
+                     ------ gestion du private-----------
+                    acces := s.getVisibility();
+                    classecourante := F^tdm.getClassname();
+                    if acces=1 then
+                        if classecourante.equals(maclasse) then
+                        else
+                            error(B_13b,ident^txt);  --champs prive
+                        end
+                    else
+                    end
+                    ------ fin gestion -------------
                     
 	                if (classname=nil | classname.equals("int") | classname.equals("bool")) then
 	                    Q^tdmcourante := nil;
@@ -1536,6 +1548,19 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
 	            -- c sur c un field
 	            classname := i.getType();
 	            maclasse := F^tdt.getClassname(); --le nom de la classe quon traite
+                
+                ------ gestion du private-----------
+                acces := i.getVisibility();
+                classecourante := F^tdm.getClassname();
+                if acces=1 then
+                    if classecourante.equals(maclasse) then
+                    else
+                        error(B_13,ident^txt);  --champs prive
+                    end
+                else
+                end
+                ------ fin gestion -------------
+                
 	            if classname.equals(maclasse) then
 	                Q^tdscourante := F^tds.getPlusHaute();
 	                Q^tdmcourante := F^tdm;
