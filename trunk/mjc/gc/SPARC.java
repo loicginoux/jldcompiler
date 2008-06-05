@@ -5,6 +5,16 @@ import mjc.tds.TDS;
 
 public class SPARC extends AbstractMachine {
 	@Override
+	public String genLoadL(String value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genMalloc(int taille, String nomtype) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
 	public String genCall(String nom) {
 		// TODO Auto-generated method stub
 		return null;

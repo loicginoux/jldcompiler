@@ -3,7 +3,7 @@ class Point {
 	private int x;
 	private int y;
 	
-	public Point(int a,int b,bool c,int d){
+	public Point(int a,int b){
 		x=a;
 		this.y=b;
 	}
