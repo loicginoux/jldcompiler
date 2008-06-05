@@ -7,7 +7,7 @@ import mjc.tds.TDS;
 public class TAM extends AbstractMachine {
 	
 	public String genSyso(String type) {
-		String retligne="\tLOADL \"\\n\"\n\tSUBR SOut\n";
+		String retligne="\tLOADL '\\n\'\n\tSUBR COut\n";
 		if (type.equals("int"))
 			return "\tSUBR IOut\n"+retligne; 
 		else if (type.equals("bool")) //bool
@@ -30,21 +30,6 @@ public class TAM extends AbstractMachine {
 				+ "\tHALT\n";
 	}
 	
-	/*
-	 * TODO : reflechir ^^
-	 */
-//	public static String genDecl(String n, INFO i, int taille) {
-//        return "\tPUSH " + taille + "   ; decl de " + n + " en " + i.getDep()
-//          + "/SB" + " taille = " + taille + "\n";
-//    }
-//    
-//    public static String genStore(String n, INFO i, int taille) {
-//    	return "\tSTORE(" + taille + ") " + i.getDep() + "[SB]; sauvegarde\n";
-//    }
-//    
-//    public static String genLoadIdent(String var, INFO i, int taille) {
-//    	return "\tLOAD(" + taille + ") " + i.getDep() + "[SB] ; " + var + "\n";
-//    }
 	
     public static String genPop(int taille1, int taille2){
     	return "\tPOP(" + taille1 + ") " + taille2 + "\n";
@@ -119,7 +104,7 @@ public class TAM extends AbstractMachine {
     }
 
     
-    public static String genLoadL(String value){
+    public String genLoadL(String value){
     	return "\tLOADL " + value + "\n";
     }
     
@@ -237,6 +222,15 @@ public class TAM extends AbstractMachine {
     @Override
     public String genCall(String nom) {
     	return "\tCALL (LB) "+nom+"\n";
+    }
+    @Override
+    public String genMalloc(int taille, String nomtype) {
+    	String code;
+    	code =genLoadL(taille+"");
+    	code +="\tSUBR MAlloc\t\t; new "+nomtype+"\n";
+    	
+    	return code;
+    	
     }
 
 }

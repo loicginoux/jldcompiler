@@ -1345,10 +1345,33 @@ F ->  paro #aff E parf #code ;
     }
     
 -- new --------------------------------------------------------------------------------------------
-F -> nouveau  TYPE paro ARGS parf #code ;
-    #code {
+F -> nouveau  TYPE #tdm paro ARGS parf #code ;
+    global
+        s:Signature;
+    #tdm {
+        local 
+            l : List<Signature>;
         do
-          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
+            l := F^tdm.chercherGlobalementSansArgs(TYPE^nom);
+            if (l.isEmpty()) then
+                error(B_10,TYPE^nom);
+            else        
+                s := l.get(0); --on prend la premiere car on ne gere pas la surcharge
+            end
+
+        end
+    }
+    #code {
+        local 
+            code : String;
+            type : Type;
+        do
+            type := F^tdt.chercherGlobalement(TYPE^nom);
+            code := F^machine.genMalloc(type.getTaille(),TYPE^nom); --ici on a le this ds la pile
+            code := code + ARGS^code; --code des args
+            code := code + F^machine.genCall(
+                TYPE^nom+"_"+TYPE^nom + "_" + s.getStringParams());
+            F^code := code;
         end
     }
     
@@ -1371,7 +1394,7 @@ F -> this #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
+          F^code := "\t\t;THIS NOT IMPLANTED\n"; -- TODO
         end
     }
     
