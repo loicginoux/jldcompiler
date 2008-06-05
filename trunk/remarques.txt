@@ -10,6 +10,11 @@ pop le retour quand il n'est pas utilise
 return pour les statiques plus complexe
 attention -1 impossible en tam
 gestion du return
+revoir le chercher globalement de la tdm pour la surcharge
+revoir la visibilite des attributs des classes etendues
+
+ATTENTION : 
+type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
 
 
 

@@ -1,6 +1,6 @@
 class Point {
   protected int x;
-  protected int y;
+  private int y;
   static public Point origine;
 
   public Point(int a, int b){
@@ -25,7 +25,7 @@ class Point {
 
     
   public void setx(int l) {
-    x = (l=3);
+    x = l;
     }
     
   public void sety(int l) {

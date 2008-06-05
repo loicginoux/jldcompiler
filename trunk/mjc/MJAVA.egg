@@ -631,6 +631,25 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
             PARFS^dep := -1;
 	    end
     }
+    #tdm {
+        local
+            stemp : Signature; 
+        do
+            s := new Signature();
+            call s.ajouter(PARFS^params);
+            call s.setStatique(DEF^visibilitySyn.getDroite());
+            call s.setVisibility(DEF^visibilitySyn.getGauche());
+                -- cf remarques typage constructeur
+            call s.setRetour(nil);
+
+            if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then --meme cons
+                error(B_06, ident^txt, s.toString());
+            else
+            end
+            call DEF^tdm.inserer(ident^txt + "_" + s.getStringParams(), s);
+            BLOC^nomMethode := ident^txt + "_" + s.getStringParams();
+        end
+    }
     #tdsap {
 	    local 
 	        i:INFO;
@@ -639,8 +658,8 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
 	    
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
-	                write(ident^txt+" statique : pas encore traite a donf\n");
-	                BLOC^tds := tds; --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
+	                 --constructeur statique
+                     error(B_20);
 	            else
 	                i := new INFO();
 	                call i.setType(DEF^tdt.getClassname());
@@ -663,24 +682,7 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
 	        BLOC^dep := 3; --header
 	    end
     }
-	#tdm {
-		local
-		    stemp : Signature; 
-		do
-		    s := new Signature();
-		    call s.ajouter(PARFS^params);
-		    call s.setStatique(DEF^visibilitySyn.getDroite());
-		    call s.setVisibility(DEF^visibilitySyn.getGauche());
-		    call s.setRetour(DEF^tdt.getClassname());
-
-		    if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then --meme cons
-		        error(B_06, ident^txt, s.toString());
-		    else
-		    end
-		    call DEF^tdm.inserer(ident^txt + "_" + s.getStringParams(), s);
-		    BLOC^nomMethode := ident^txt + "_" + s.getStringParams();
-		end
-	}
+	
     #tailleatt {
 	    do
 	        DEF^tailleatt := 0;
@@ -803,8 +805,17 @@ BLOC ->  aco #dep INSTS acf #code #debug;
 	    end
     }
 	#code {
+        local
+            suite:String;
 		do
-		    BLOC^code := INSTS^code;
+            if INSTS^taille=0 then
+                --optimisation de code
+                suite := "";
+            else
+                suite := BLOC^machine.genPop(0,INSTS^taille,"fin du bloc");
+            end
+		    BLOC^code := INSTS^code+suite;
+                         
 		end
 	}
     #debug {
@@ -1376,11 +1387,22 @@ F -> nouveau  TYPE #tdm paro ARGS parf #code ;
     }
     
 -- this -------------------------------------------------------------------------------------------
-F -> this #ismethode #tdsmcourante Q #code ;
+F -> this #ismethode #tds #tdsmcourante Q #code ;
     #ismethode {
 	    do
 	        Q^ismethode := false;
 	    end
+    }
+    #tds {
+        local 
+            i:INFO;
+        do
+            i := F^tds.chercherGlobalement("this");
+            if i=nil then
+                error(B_10,"this");
+            else
+            end
+        end
     }
     #tdsmcourante {
 	    local
@@ -1393,8 +1415,29 @@ F -> this #ismethode #tdsmcourante Q #code ;
 	    end
     }
     #code {
+        local
+            code:String;
         do
-          F^code := "\t\t;THIS NOT IMPLANTED\n"; -- TODO
+            code := "";
+          if F^isAffectable.isAffectable() then
+            if Q^code.equals("") then
+                --acces par reference interdit
+                error(B_18,"this");
+            else
+                -- acces par valeur pour calcul dadresse
+                code := F^machine.genExprIdent(F^tds, "this")
+                   +F^machine.genLoadI("this");
+                call F^isAffectable.setAdr(code + Q^code);
+                code := "";
+            end
+          else
+            --acces par valeur
+            code := F^machine.genExprIdent(F^tds, "this")
+                   +F^machine.genLoadI("this")
+                   +Q^code;
+          end
+          
+          F^code := code;
         end
     }
     
@@ -1510,7 +1553,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
             code : String;
             i : INFO;
         do
-          if ismethode then 
+          if ismethode then --methode
             
             code := "";
             --si elle est statique
@@ -1529,16 +1572,25 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
             end
             
             code := code+ F^machine.genCall(
-                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams());
+                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams())+
+                Q^code;
             F^code := code;
-          else
+          else --attribut
 	          code := F^machine.genExprIdent(F^tds, ident^txt);
 	          if F^isAffectable.isAffectable() then
+                --elle va etre affectee
+                    if Q^code.equals("") then
+                        -- passage par reference
+                    else
+                        -- passage par valeur
+                        code := code + F^machine.genLoadI(ident^txt) + Q^code;
+                    end
 	            call F^isAffectable.setAdr(code);
 	            F^code := "";
 	          else
 	            -- on le charge
-	            F^code := code + F^machine.genLoadI(ident^txt);
+	            F^code := code + F^machine.genLoadI(ident^txt)
+                          +Q^code;
 	          end
           end
         end
@@ -1566,11 +1618,10 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
     
     global 
         ismethode : Boolean;
-
+        s:Signature;
     #ismethode {
 	    local 
 	        i:INFO;
-	        s:Signature;
 	    do 
 	        --- verifier que Q a une table de symbole courante
 	        if Q^tdscourante = nil then
@@ -1610,7 +1661,6 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
     #tdsmcourante {
 	    local
 	        l:List<Signature>;
-	        s:Signature;
 	        i:INFO;
 	        classname : String;
 	        maclasse : String;
@@ -1684,9 +1734,52 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
 	    end
     }
     #code {
+        local
+            code:String;
         do
-          Q^code := "\t\t;NOT IMPLEMENTED\n" + Q1^code; -- TODO
-          Q^codeargs := "";
+            if ismethode then
+                if s.isStatique() then
+                    --statique in a non static way
+                    warning(B_19,ident^txt);
+                    code :=   Q^machine.genPop(0,1,"acces statique virer this")
+                            + Q1^codeargs
+                            + Q^machine.genCall(Q^tdt.getClassname()+
+                                                "_"+ident^txt + "_" + 
+                                                s.getStringParams())
+                            + Q1^code;
+                    
+                else 
+                    --dynamic
+                     code :=  Q1^codeargs
+                            + Q^machine.genCall(Q^tdmcourante.getClassname()+
+                                                "_"+ident^txt + "_" + 
+                                                s.getStringParams())
+                            + Q1^code;
+                end
+            else
+                code := Q^machine.genExprIdent(Q^tdscourante, ident^txt);
+                if Q^isAffectable.isAffectable() then
+                    --elle va etre affectee
+                    if Q1^code.equals("") then
+                        -- passage par reference
+                    else
+                        -- passage par valeur a la suite
+                        code := code + 
+                                Q^machine.genLoadI(ident^txt)+
+                                Q1^code;
+                    end
+                    --addr est affecté au dessus
+                    
+                else
+                    --il faut la charger 
+                    code := code + 
+                           Q^machine.genLoadI(ident^txt)+
+                           Q1^code;
+                end
+            end
+            
+            Q^code := code;
+            Q^codeargs := "";
         end
     }
 

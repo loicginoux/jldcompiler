@@ -27,7 +27,7 @@
 	public static void main() {
 		
 		int x=10;
-		syso(factwhile(x));
+		syso(fact(x));
 		
 	}
 

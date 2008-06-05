@@ -80,4 +80,8 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 	public void setPlusHaute(boolean isPlusHaute) {
 		this.isPlusHaute = isPlusHaute;
 	}
+
+	public boolean isPlusHaute() {
+		return isPlusHaute;
+	}
 }
