@@ -55,5 +55,6 @@ public abstract class AbstractMachine {
 	public abstract String genStore();
 	public abstract String genLoadI(String s);
 	public abstract String genReserve(String nom);
+	public abstract String genCall(String nom);
 	
 }

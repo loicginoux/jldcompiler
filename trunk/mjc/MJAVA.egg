@@ -35,6 +35,8 @@ inh tdmcourante : TDM for Q;
 
 syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
                         OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX, Q, ARGS, ARGSX;
+syn codeargs : String for Q;
+
 inh machine : AbstractMachine for PROGRAMME, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, SIX, E,
                                     ARGS, F, AFFX, ARGSX, Q, T, TX, ES, ESX, ER, ERX, OPUN,
                                     OPREL, OPADD, OPMUL;
@@ -1405,10 +1407,11 @@ F ->  super  #ismethode #tdsmcourante Q #code ;
 F ->  ident #ismethode #aff #tdsmcourante Q #code ;
     global 
         ismethode : Boolean;
+        l:List<Signature>;
+        s:Signature;
     #ismethode {
 	    local 
 	        i:INFO;
-	        s:Signature;
 	    do
 	        i := F^tds.chercherGlobalement(ident^txt);
 	        --s := F^tdm.chercherGlobalement(ident^txt); --XXX
@@ -1431,8 +1434,6 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
     }
     #tdsmcourante {
 	    local
-	        l:List<Signature>;
-	        s:Signature;
 	        i:INFO;
 	        classname : String;
 	        maclasse : String;
@@ -1484,14 +1485,38 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
     #code {
         local 
             code : String;
+            i : INFO;
         do
-          code := F^machine.genExprIdent(F^tds, ident^txt);
-          if F^isAffectable.isAffectable() then
-            call F^isAffectable.setAdr(code);
-            F^code := "";
+          if ismethode then 
+            
+            code := "";
+            --si elle est statique
+            if s.isStatique() then
+                code := Q^codeargs;
+            else
+                i := F^tds.chercherGlobalement("this");
+                if i=nil then --pas de this
+                    error(B_17,ident^txt);
+                else
+                   --rajout du calcul du this
+                   code :=  F^machine.genExprIdent(F^tds, "this")
+                           + F^machine.genLoadI(ident^txt)
+                           + Q^codeargs; 
+                end
+            end
+            
+            code := code+ F^machine.genCall(
+                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams());
+            F^code := code;
           else
-            -- on le charge
-            F^code := code + F^machine.genLoadI(ident^txt);
+	          code := F^machine.genExprIdent(F^tds, ident^txt);
+	          if F^isAffectable.isAffectable() then
+	            call F^isAffectable.setAdr(code);
+	            F^code := "";
+	          else
+	            -- on le charge
+	            F^code := code + F^machine.genLoadI(ident^txt);
+	          end
           end
         end
     }
@@ -1509,6 +1534,7 @@ Q ->  #ismethode #code ;
     #code {
         do
           Q^code := ""; -- XXX
+          Q^codeargs := "";
         end
     }
 
@@ -1552,7 +1578,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
    #aff {
         do
             if ismethode then
-                call Q^isAffectable.setAffectable(false);
+                call Q^isAffectable.setAffectable(false); --XXX
             else
             end
         end
@@ -1637,6 +1663,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
     #code {
         do
           Q^code := "\t\t;NOT IMPLEMENTED\n" + Q1^code; -- TODO
+          Q^codeargs := "";
         end
     }
 
@@ -1666,7 +1693,8 @@ Q ->  paro #aff ARGS parf #ismethode #tdsmcourante Q #code ;
     }
     #code {
         do
-          Q^code := ARGS^code + Q1^code;
+          Q^code := Q1^code;
+          Q^codeargs := ARGS^code;
         end
     }
     
