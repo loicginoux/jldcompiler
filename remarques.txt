@@ -9,6 +9,7 @@ methode statique tds a completer
 pop le retour quand il n'est pas utilise
 return pour les statiques plus complexe
 attention -1 impossible en tam
+gestion du return
 
 
 

@@ -7,12 +7,13 @@ import mjc.tds.TDS;
 public class TAM extends AbstractMachine {
 	
 	public String genSyso(String type) {
+		String retligne="\tLOADL \"\\n\"\n\tSUBR SOut\n";
 		if (type.equals("int"))
-			return "\tSUBR IOut\n"; 
+			return "\tSUBR IOut\n"+retligne; 
 		else if (type.equals("bool")) //bool
-			return "\tSUBR BOut\n";
+			return "\tSUBR BOut\n"+retligne;
 		else //string
-			return "\tSUBR SOut\n";
+			return "\tSUBR SOut\n"+retligne;
 	}
 	private static int n = 0;
 
@@ -164,7 +165,7 @@ public class TAM extends AbstractMachine {
 	}
 
 	public String genSupEg() {
-		return "\tSUBR IGeg\n";
+		return "\tSUBR IGeq\n";
 	}
 
 	public String genEg() {
@@ -172,7 +173,7 @@ public class TAM extends AbstractMachine {
 	}
 
 	public String genNEg() {
-		return "\tSUBR Ieq\n";
+		return "\tSUBR INeq\n";
 	}
 	
 	public String genPlus() {
@@ -232,6 +233,10 @@ public class TAM extends AbstractMachine {
     @Override
     public String genReserve(String nom) {
     	return "\tPUSH 1\t\t\t; place de "+nom+"\n";
+    }
+    @Override
+    public String genCall(String nom) {
+    	return "\tCALL (LB) "+nom+"\n";
     }
 
 }

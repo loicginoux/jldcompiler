@@ -1,20 +1,33 @@
  class TestStatique {
  
+ 	public static int factwhile(int n){
+ 		int cpt=n;
+ 		int mult=1;
+ 		
+ 		while((cpt<1) || (cpt>1)){
+ 			mult=mult*cpt;
+ 			cpt=cpt-1;
+ 		}
+ 	
+ 		return mult;	
+ 	}
+ 
+ 	public static int fact(int n){
+ 		if(n<=1){
+ 			return 1;
+ 		}else{
+ 			return n*fact(n-1);
+ 		}
+ 	}
+ 
  	public static int f(int x){
  		return 2*x;
  	}
 	
 	public static void main() {
 		
-		int x;
-		x=4;
-		
-		int y=3;
-		int z;
-		
-		z=x*y;
-		
-		syso(2*z);
+		int x=10;
+		syso(factwhile(x));
 		
 	}
 

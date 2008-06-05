@@ -5,6 +5,11 @@ import mjc.tds.TDS;
 
 public class X86 extends AbstractMachine {
 	@Override
+	public String genCall(String nom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
 	public String genSyso(String type) {
 		// TODO Auto-generated method stub
 		return null;
