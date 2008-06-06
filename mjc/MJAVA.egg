@@ -33,7 +33,7 @@ inh tdscourante : TDS for Q;
 inh tdmcourante : TDM for Q;
 
 
-syn code : String for IMPORTS, DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
+syn code : String for  DEFCLASSE, DEFS, DEF, BLOC, INSTS, INST, AFFX, E, SIX, F, OPUN,
                         OPREL, OPADD, OPMUL, ESX, T, TX, ER, ES, ERX, Q, ARGS, ARGSX;
 syn codeargs : String for Q;
 
@@ -105,7 +105,7 @@ term ident is  "[_A-Za-z][_0-9A-Za-z]*";
 
 
 ---------- REGLES DE PRODUCTION -------------------------------------------------------------------
-PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
+PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #verifnom #gen #sauv #linkage ;
     global
        machine : AbstractMachine;
        tds : TDS;
@@ -142,12 +142,28 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
 	        DEFCLASSE^tdm := tdm;
 	    end
     }
+    #verifnom {
+        local 
+            nomfichier : String;
+            nomclasse : String;
+        do
+            nomfichier := PROGRAMME^source.getFileName();
+            nomclasse := tdt.getClassname();
+            if nomfichier.endsWith(nomclasse) then
+                --ok
+            else
+                --fichier pas du meme nom
+                error(B_21,nomclasse);
+            end
+            
+        end
+    }
     #gen {
         do
           write ";TDS : " + tds;
           write "\n\n;TDT : " + tdt + "\n";
           write "\n\n;TDM : " + tdm + "\n";
-          call machine.writeCode(PROGRAMME^source.getFileName(), IMPORTS^code + DEFCLASSE^code);
+          call machine.writeCode(PROGRAMME^source.getFileName(),DEFCLASSE^code); --on ecrit pas import
           write "fin gen\n";
         end
     }
@@ -159,7 +175,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
 	        call fac.persister(tds, tdt.getClassname() + ".tds");
 	        call fac.persister(tdt, tdt.getClassname() + ".tdt");
 	        call fac.persister(tdm, tdt.getClassname() + ".tdm");
-	        call fac.persister(IMPORTS^code + DEFCLASSE^code, tdt.getClassname() + "_code." + langage);
+	        call fac.persister(DEFCLASSE^code, tdt.getClassname() + "_code." + langage);
 	        write "fin sauv\n";
 	    end
     }
@@ -173,7 +189,8 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
             main := tdm.chercherLocalement("main_");
             if main /= nil then -- il y a un main
                 if main.isStatique() then
-                    code := machine.genLinkage(IMPORTS^code + DEFCLASSE^code, tdt.getClassname());
+                    code := fac.genLinkageImports(tdt);
+                    code := machine.genLinkage(code+DEFCLASSE^code, tdt.getClassname());
                     call machine.writeCode(PROGRAMME^source.getFileName() + "_exe", code);
                 else
                     error(B_16);
@@ -184,19 +201,14 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #gen #sauv #linkage ;
         end
     }
 
-IMPORTS -> #tdts #code;
+IMPORTS -> #tdts ;
 	#tdts {
 		do
 		    IMPORTS^tdts := new Vector<TDT>();
 		end
 	}
-	#code {
-		do
-		    IMPORTS^code := "";
-		end
-	}
 
-IMPORTS -> import ident pv IMPORTS #tdts #code;
+IMPORTS -> import ident pv IMPORTS #tdts ;
 	#tdts {
 		local 
 		    fac : Factory;
@@ -217,16 +229,6 @@ IMPORTS -> import ident pv IMPORTS #tdts #code;
 		        call tdts.add(tdt);
 		        IMPORTS^tdts := tdts;
 		    end
-		end
-	}
-	#code {
-		local 
-		    fac : Factory;
-		    importCode : String;
-		do
-		    fac := new Factory();
-		    importCode := fac.chargerCode(ident^txt + "_code");
-		    IMPORTS^code := ";import "+ ident^txt + "\n" + importCode + "\n" + IMPORTS1^code;
 		end
 	}
 
@@ -1356,14 +1358,30 @@ F ->  paro #aff E parf #code ;
     }
     
 -- new --------------------------------------------------------------------------------------------
-F -> nouveau  TYPE #tdm paro ARGS parf #code ;
+F -> nouveau  TYPE #tdt #tdm paro ARGS parf #code ;
     global
         s:Signature;
+        tdm : TDM;
+    #tdt {
+        local
+            t : Type;
+            fac:Factory;
+        do
+            fac := new Factory();
+            t := F^tdt.chercherLocalement(TYPE^nom);
+            if t = nil then  
+                error(B_04, TYPE^nom); --type inconnu ds les import
+                tdm := new TDM(); --pas de nullexecp
+            else
+                tdm := fac.chargerTDM(TYPE^nom);
+            end 
+        end
+    }
     #tdm {
         local 
             l : List<Signature>;
         do
-            l := F^tdm.chercherGlobalementSansArgs(TYPE^nom);
+            l := tdm.chercherGlobalementSansArgs(TYPE^nom);
             if (l.isEmpty()) then
                 error(B_10,TYPE^nom);
             else        
