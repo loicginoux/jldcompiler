@@ -42,7 +42,7 @@ public class Factory {
 		} catch (FileNotFoundException e) {
 			return null;
 		} catch (Exception e) {
-			throw new RuntimeException("Impossible de charger la TDT : "+e);
+			throw new RuntimeException("Impossible de charger le code : "+e);
 		}
 	}
 	
@@ -94,6 +94,10 @@ public class Factory {
 		} catch (Exception e) {
 			throw new RuntimeException("Impossible de charger la TDS : "+e);
 		}
+	}
+	
+	public static String genLinkageImports(TDT tdt){
+		return "\t\t; NOT IMPLANTED link imports\n";
 	}
 	
 	public static boolean isNull(Object o){

@@ -3,7 +3,7 @@ TODO OU XXX
 
 typage
 surcharge de fonction
-appel dynamique
+appel tardif
 attributs statique
 methode statique tds a completer
 pop le retour quand il n'est pas utilise
@@ -12,6 +12,9 @@ attention -1 impossible en tam
 gestion du return
 revoir le chercher globalement de la tdm pour la surcharge
 revoir la visibilite des attributs des classes etendues
+nom classe = nom fichier -- FIXED
+probleme import pour la tdm de new TYPE --FIXED
+probleme import = include dans la generation 
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
