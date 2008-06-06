@@ -1,11 +1,18 @@
 import un;
 
 class deux extends un{
-	protected int deux;
+	private int deux_param;
 	
 	public deux(){
 		super = new un();
-		un=2;
+		deux_param=2;
+		syso(un_param);
+		un_param=deux_param;
+		syso(un_param);
+	}
+	
+	public static void main(){
+		deux d = new deux();
 	}
 	
 }

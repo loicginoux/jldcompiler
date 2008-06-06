@@ -1,7 +1,7 @@
 class un{
-	protected int un;
+	protected int un_param;
 	
 	public un(){
-		un=1;
+		un_param=1;
 	}
 }
