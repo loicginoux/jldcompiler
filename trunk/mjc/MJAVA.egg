@@ -1640,7 +1640,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
             end
             
             code := code+ F^machine.genCall(
-                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams())+
+                s.getMaclasse()+"_"+ident^txt + "_" + s.getStringParams())+
                 Q^code;
             F^code := code;
           else --attribut
@@ -1811,7 +1811,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
                     warning(B_19,ident^txt);
                     code :=   Q^machine.genPop(0,1,"acces statique virer this")
                             + Q1^codeargs
-                            + Q^machine.genCall(Q^tdt.getClassname()+
+                            + Q^machine.genCall(s.getMaclasse()+
                                                 "_"+ident^txt + "_" + 
                                                 s.getStringParams())
                             + Q1^code;
@@ -1819,7 +1819,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
                 else 
                     --dynamic
                      code :=  Q1^codeargs
-                            + Q^machine.genCall(Q^tdmcourante.getClassname()+
+                            + Q^machine.genCall(s.getMaclasse()+
                                                 "_"+ident^txt + "_" + 
                                                 s.getStringParams())
                             + Q1^code;

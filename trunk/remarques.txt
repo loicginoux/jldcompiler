@@ -18,6 +18,7 @@ probleme import = include dans la generation --FIXED
 bug acces super implicite  --FIXED
 appel super obligatoire
 verification constructeur par defo
+bug etiquette call sous-classe
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
