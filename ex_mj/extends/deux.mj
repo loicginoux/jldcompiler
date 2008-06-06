@@ -5,7 +5,7 @@ class deux extends un{
 	
 	public deux(){
 		super = new un();
-		deux=2;
+		un=2;
 	}
 	
 }

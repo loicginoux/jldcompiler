@@ -1488,8 +1488,27 @@ F ->  super  #ismethode #tdsmcourante Q #code ;
 	    end
     }
     #code {
+        local
+            code:String;
         do
-          F^code := "\t\t;NOT IMPLEMENTED\n"; -- TODO
+          code := F^machine.genExprIdent(F^tds, "super");
+          if F^isAffectable.isAffectable() then
+            if Q^code.equals("") then
+                --acces par reference 
+            else
+                -- acces par valeur pour calcul dadresse
+                code := code + F^machine.genLoadI("super") + Q^code;
+            end
+            call F^isAffectable.setAdr(code);
+            code:="";
+          else
+            --acces par valeur
+            code := F^machine.genExprIdent(F^tds, "super")
+                   +F^machine.genLoadI("super")
+                   +Q^code;
+          end
+          
+          F^code := code;
         end
     }
     

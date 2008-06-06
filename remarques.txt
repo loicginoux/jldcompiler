@@ -14,8 +14,10 @@ revoir le chercher globalement de la tdm pour la surcharge
 revoir la visibilite des attributs des classes etendues --FIXED
 nom classe = nom fichier -- FIXED
 probleme import pour la tdm de new TYPE --FIXED
-probleme import = include dans la generation 
+probleme import = include dans la generation --FIXED
 bug acces super implicite  --FIXED
+appel super obligatoire
+verification constructeur par defo
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
