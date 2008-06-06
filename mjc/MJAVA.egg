@@ -301,6 +301,7 @@ EXTENSION -> etend ident #tdt #tds #tdm ; -- le code est deja insere dans les im
 		    call i.setStatique(false);
 		    call i.setVisibility(1); -- le super est private
 		    call i.setType(ident^txt);
+            call i.setAttribute(true);
 		    call EXTENSION^tds.inserer("super",i);
 		end
 	}
