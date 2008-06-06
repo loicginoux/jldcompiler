@@ -24,12 +24,31 @@ att :
 class :
 	$(JDIR)/javac -classpath $(GJAR) mjc/egg/*.java
 
-clean :
-	rm -rf $(PACKAGE)
-	rm -f mjc/compiler/*.class
-	rm -f mjc/gc/*.class
-	rm -f mjc/tds/*.class
-	rm -f mjc/type/*.class
-	rm -f mjc/egg/*.class
+cleanall :
+	rm -f **/*.class
+	rm -f **/**/*.class
+	rm -f **/**/**/*.class
 	rm -f mjc/egg/*.tds
+	rm -f *.tds
+	rm -f **/*.tds
+	rm -f *.tdm
+	rm -f **/*.tdm
+	rm -f *.tdt
+	rm -f **/*.tdt
+	rm -f *.tam
+	rm -f **/*.tam
+	rm -f **/**/*.tam
+	rm -f **/**/**/*.tam
 
+clean :
+	rm -f mjc/egg/*.tds
+	rm -f *.tds
+	rm -f **/*.tds
+	rm -f *.tdm
+	rm -f **/*.tdm
+	rm -f *.tdt
+	rm -f **/*.tdt
+	rm -f *.tam
+	rm -f **/*.tam
+	rm -f **/**/*.tam
+	rm -f **/**/**/*.tam

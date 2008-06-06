@@ -1,10 +1,10 @@
 import Point;
+
 class PointCol extends Point {
   private int col;
 
   public  PointCol (int xi,int yi, int ci) {
-		x=xi;
-		y=yi;
+  		super = new Point(xi, yi);
 		col = ci;
 	}
 
