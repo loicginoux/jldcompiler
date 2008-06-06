@@ -1,0 +1,11 @@
+import un;
+
+class deux extends un{
+	protected int deux;
+	
+	public deux(){
+		super = new un();
+		deux=2;
+	}
+	
+}
