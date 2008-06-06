@@ -5,9 +5,7 @@ class trois extends deux{
 	private int trois;
 	
 	public trois(){
-		trois=3;
-		deux=3;
-		syso(un);
+		un = super;
 	}
 }
 	
