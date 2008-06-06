@@ -1,6 +1,7 @@
 class Point {
-  protected int x;
-  protected int y;
+
+  private int x;
+  private int y;
   static public Point origine;
 
   public Point(int a, int b){
@@ -35,9 +36,6 @@ class Point {
   public void init (int xi,int yi) {
     x = xi;
     y = yi;
-    y = 8;
-    if(y==0){
-    }
     }
         
   public void xtrans(int d){
