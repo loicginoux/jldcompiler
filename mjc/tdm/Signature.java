@@ -18,6 +18,7 @@ public class Signature implements Serializable {
 	private boolean statique;
 	List<String> params;
 	String retour;
+	String maclasse;
 	
 	
 	public Signature (){
@@ -68,7 +69,7 @@ public class Signature implements Serializable {
 			resParam+= p+ ",";
 		}
 		
-		return "INFO : " + visi + " " + stat + " " + retour +"\n parametre:" + resParam.substring(0, resParam.length()-1);
+		return "appart : "+maclasse+" INFO : " + visi + " " + stat + " " + retour +"\n parametre:" + resParam.substring(0, resParam.length()-1);
 	}
 	
 	public boolean equalsBis(Object o){
@@ -121,6 +122,14 @@ public class Signature implements Serializable {
 		res +=  list.get(i);
 		}
 		return res;
+	}
+
+	public String getMaclasse() {
+		return maclasse;
+	}
+
+	public void setMaclasse(String maclasse) {
+		this.maclasse = maclasse;
 	}
 
 

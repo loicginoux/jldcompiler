@@ -11,7 +11,7 @@ return pour les statiques plus complexe
 attention -1 impossible en tam
 gestion du return
 revoir le chercher globalement de la tdm pour la surcharge
-revoir la visibilite des attributs des classes etendues
+revoir la visibilite des attributs des classes etendues --FIXED
 nom classe = nom fichier -- FIXED
 probleme import pour la tdm de new TYPE --FIXED
 probleme import = include dans la generation 
