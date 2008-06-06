@@ -1,3 +1,6 @@
+import Coord;
+import lala;
+
 class Point {
 
 	private int x;
