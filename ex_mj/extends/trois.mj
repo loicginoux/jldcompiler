@@ -5,7 +5,7 @@ class trois extends deux{
 	private int trois;
 	
 	public trois(){
-		un = super;
+		
 	}
 }
 	
