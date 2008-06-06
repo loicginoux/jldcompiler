@@ -15,6 +15,7 @@ revoir la visibilite des attributs des classes etendues --FIXED
 nom classe = nom fichier -- FIXED
 probleme import pour la tdm de new TYPE --FIXED
 probleme import = include dans la generation 
+bug acces super implicite  --FIXED
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet

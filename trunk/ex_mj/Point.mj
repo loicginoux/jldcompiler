@@ -1,6 +1,6 @@
 class Point {
   protected int x;
-  private int y;
+  protected int y;
   static public Point origine;
 
   public Point(int a, int b){
