@@ -19,7 +19,7 @@ class PointCol extends Point {
     }
 
   public int type () {
-    return 2;
+    return gety();
     } 
   
   }

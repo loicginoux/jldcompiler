@@ -215,6 +215,7 @@ IMPORTS -> import ident pv IMPORTS #tdts ;
 		    tdt : TDT;
 		    tdts : List<TDT>;
 		do
+                
 		    fac := new Factory();
 		    tdt := fac.chargerTDT(ident^txt);
 		    if tdt = nil then
@@ -421,6 +422,7 @@ DEF ->  TYPE ident pv #tdt #tds #code #tailleatt ;
 		        call i.setVisibility(DEF^visibilitySyn.getGauche());
 		        call i.setType(TYPE^nom);
                 call i.setAttribute(true);
+                call i.setMaclasse(DEF^tdt.getClassname());
 		        call DEF^tds.inserer(ident^txt, i);
                 
                 ---deplacement
@@ -509,6 +511,7 @@ DEF ->  TYPE ident paro #tds PARFS #tdt #tdm #tdsap parf #dep BLOC #tailleatt #c
 		    call s.setStatique(DEF^visibilitySyn.getDroite());
 		    call s.setVisibility(DEF^visibilitySyn.getGauche());
 		    call s.setRetour(TYPE^nom);
+            call s.setMaclasse(DEF^tdt.getClassname());
 
 		    if (DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then --meme methode
 		        error(B_06, ident^txt, s.toString());
@@ -591,6 +594,7 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 		    call s.setStatique(DEF^visibilitySyn.getDroite());
 		    call s.setVisibility(DEF^visibilitySyn.getGauche());
 		    call s.setRetour(nil);
+            call s.setMaclasse(DEF^tdt.getClassname());
 
 		    if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then --meme methode
 		        error(B_06, ident^txt, s.toString());
@@ -643,6 +647,7 @@ DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt
             call s.setVisibility(DEF^visibilitySyn.getGauche());
                 -- cf remarques typage constructeur
             call s.setRetour(nil);
+            call s.setMaclasse(DEF^tdt.getClassname());
 
             if(DEF^tdm.containsKey(ident^txt + "_" + s.getStringParams())) then --meme cons
                 error(B_06, ident^txt, s.toString());
@@ -1539,7 +1544,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
 	                
                      ------ gestion du private-----------
                     acces := s.getVisibility();
-                    classecourante := F^tdm.getClassname();
+                    classecourante := s.getMaclasse();
                     if acces=1 then
                         if classecourante.equals(maclasse) then
                         else
@@ -1569,7 +1574,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
                 
                 ------ gestion du private-----------
                 acces := i.getVisibility();
-                classecourante := F^tdm.getClassname();
+                classecourante := i.getMaclasse();
                 if acces=1 then
                     if classecourante.equals(maclasse) then
                     else
@@ -1651,7 +1656,7 @@ Q ->  #ismethode #code ;
     }
     #code {
         do
-          Q^code := ""; -- XXX
+          Q^code := ""; 
           Q^codeargs := "";
         end
     }
@@ -1725,7 +1730,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
 	                
 	                ------ gestion du private-----------
 	                acces := s.getVisibility();
-	                classecourante := Q^tdmcourante.getClassname();
+	                classecourante := s.getMaclasse();
 	                if acces=1 then
 	                    if classecourante.equals(maclasse) then
 	                    else
@@ -1755,7 +1760,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
 	            
 	            ------ gestion du private-----------
 	            acces := i.getVisibility();
-	            classecourante := Q^tdmcourante.getClassname();
+	            classecourante := i.getMaclasse();
 	            if acces=1 then
 	                if classecourante.equals(maclasse) then
 	                else

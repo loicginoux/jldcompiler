@@ -13,7 +13,7 @@ class Point {
     return x;
     }
     
-  public int gety() {
+  private int gety() {
     return y;
     }
     

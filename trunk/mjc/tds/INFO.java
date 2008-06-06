@@ -18,6 +18,7 @@ public class INFO implements Serializable {
 	private boolean statique;
 	private String type;
 	private boolean isAttribute=false;
+	private String maclasse;
 
 
 	public int getDep() {
@@ -63,7 +64,7 @@ public class INFO implements Serializable {
 		if(statique) stat="static";
 		else stat="dynamic";
 		
-		return "INFO : " + visi + " " + stat + " " + type + " dep : "+ dep; 
+		return "INFO : appart : "+maclasse+" attribute ? "+isAttribute+" " + visi + " " + stat + " " + type + " dep : "+ dep; 
 	}
 
 	public boolean isAttribute() {
@@ -72,5 +73,13 @@ public class INFO implements Serializable {
 
 	public void setAttribute(boolean isAttribute) {
 		this.isAttribute = isAttribute;
+	}
+
+	public String getMaclasse() {
+		return maclasse;
+	}
+
+	public void setMaclasse(String maclasse) {
+		this.maclasse = maclasse;
 	}
 }
