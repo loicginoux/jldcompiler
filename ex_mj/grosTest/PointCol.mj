@@ -18,9 +18,5 @@ class PointCol extends Point {
 		    this.y = yi;
 		    this.col = 84;
 	  }
-	
-	  public int type () {
-		    return gety();
-	  } 
 	  
 }
