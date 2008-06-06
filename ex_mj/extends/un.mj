@@ -1,0 +1,7 @@
+class un{
+	protected int un;
+	
+	public un(){
+		un=1;
+	}
+}
