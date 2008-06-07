@@ -9,6 +9,7 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	private TDS parente;
 	private boolean isPlusHaute;
+	private String classname;
 
 	public TDS() {
 		super();
@@ -40,7 +41,8 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("\n");
+		sb.append("\n haute : "+isPlusHaute+"\n");
+		sb.append(" appart : "+classname+"\n");
 		
 		//pour avoir tout dans le bon ordre
 		for(String s:keySet()){
@@ -83,5 +85,13 @@ public class TDS extends HashMap<String, INFO> implements Serializable {
 
 	public boolean isPlusHaute() {
 		return isPlusHaute;
+	}
+
+	public String getClassname() {
+		return classname;
+	}
+
+	public void setClassname(String classname) {
+		this.classname = classname;
 	}
 }

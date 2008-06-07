@@ -126,6 +126,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #verifnom #gen #sauv #linka
     #tds {
         do
             tds := new TDS();
+            call tds.setClassname("anonyme");
             call tds.setPlusHaute(true);
             DEFCLASSE^tds := tds;
         end
@@ -149,6 +150,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #verifnom #gen #sauv #linka
         do
             nomfichier := PROGRAMME^source.getFileName();
             nomclasse := tdt.getClassname();
+            call tds.setClassname(nomclasse);
             if nomfichier.endsWith(nomclasse) then
                 --ok
             else
@@ -234,8 +236,11 @@ IMPORTS -> import ident pv IMPORTS #tdts ;
 	}
 
 -- definition d'une classe ------------------------------------------------------------------------
-DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
-	#tdt {
+DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code #tdmauto #codeauto ;
+	global
+        auto_sigs:List<COUPLE<String,Signature>>;
+        code : String;
+    #tdt {
 		local 
 		    type : Type;
 		do
@@ -251,6 +256,7 @@ DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
 	#tdm {
 		do
 		    call DEFCLASSE^tdm.setClassname(ident^txt);
+            call DEFCLASSE^tds.setClassname(ident^txt);
 		end
 	}
     #attdep {
@@ -266,12 +272,24 @@ DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code ;
 	        end
 	    end
     }
+
 	#code {
 		do
-		    DEFCLASSE^code := ";classe "+ ident^txt + "\n" + DEFS^code;
+		    code := ";classe "+ ident^txt + "\n" + DEFS^code;
 		end
 	}
-    
+    #tdmauto {
+        local
+        -- ajout automatique de tous ce qui n'a pa été redéfinie
+        do
+            auto_sigs := DEFCLASSE^tdm.autoHeritage();   
+        end
+    }
+    #codeauto {
+        do
+            DEFCLASSE^code := code + DEFCLASSE^machine.genAutoCode(auto_sigs,DEFCLASSE^tds);
+        end
+    }
 -- heritage
 EXTENSION -> etend ident #tdt #tds #tdm ; -- le code est deja insere dans les imports
 	#tdt {
@@ -1634,13 +1652,14 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
                 else
                    --rajout du calcul du this
                    code :=  F^machine.genExprIdent(F^tds, "this")
-                           + F^machine.genLoadI(ident^txt)
+                           + F^machine.genLoadI("this")
+                           --+ F^machine.genObtenirClasse(F^tds.getPlusHaute(),s.getMaclasse())
                            + Q^codeargs; 
                 end
             end
             
             code := code+ F^machine.genCall(
-                s.getMaclasse()+"_"+ident^txt + "_" + s.getStringParams())+
+                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams())+
                 Q^code;
             F^code := code;
           else --attribut
@@ -1818,8 +1837,9 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
                     
                 else 
                     --dynamic
-                     code :=  Q1^codeargs
-                            + Q^machine.genCall(s.getMaclasse()+
+                     code :=  ""--Q^machine.genObtenirClasse(Q^tdscourante,s.getMaclasse())
+                            +  Q1^codeargs
+                            + Q^machine.genCall(Q^tdmcourante.getClassname()+
                                                 "_"+ident^txt + "_" + 
                                                 s.getStringParams())
                             + Q1^code;

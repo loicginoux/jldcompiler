@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import mjc.lib.COUPLE;
+
 public class TDM extends HashMap<String, Signature> implements Serializable {
 
 		private static final long serialVersionUID = 1L;
@@ -95,6 +97,46 @@ public class TDM extends HashMap<String, Signature> implements Serializable {
 
 		public void setClassname(String classname) {
 			this.classname = classname;
+		}
+		
+		/**
+		 * Insere dans la table des methodes courantes
+		 * toutes les méthodes qui sont heritees et qui n'ont pas
+		 * ete redefinies pour la classe suivante
+		 * 
+		 */
+		public List<COUPLE<String, Signature>> autoHeritage(){
+			if(getParente()==null){
+				return new Vector<COUPLE<String, Signature>>();
+			}
+			else{
+				List<COUPLE<String, Signature>> ret = 
+					new Vector<COUPLE<String, Signature>>();
+				List<String> setp = new Vector<String>();
+				
+				//recup tout le monde sauf
+				//le constructeur et les statiques
+				for(String ss:parente.keySet()){
+					if(!ss.startsWith(parente.getClassname()) 
+							&& !parente.get(ss).isStatique()
+							&& (parente.get(ss).getVisibility()!=Signature.PRIVATE) ){
+						setp.add(ss);
+					}
+				}
+
+				for(String ss:setp){
+					if(!containsKey(ss)){
+						System.out.println("auto-ajout : "+ss);
+						Signature clonesig = parente.get(ss).clone();
+						clonesig.setMaclasse(getClassname());
+						ret.add(new COUPLE<String, Signature>(ss,clonesig));
+						this.put(ss,clonesig);
+					}
+				}
+				
+				return ret;
+				
+			}
 		}
 
 

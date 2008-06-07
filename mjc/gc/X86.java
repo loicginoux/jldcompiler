@@ -1,9 +1,23 @@
 package mjc.gc;
 
+import java.util.List;
+
+import mjc.lib.COUPLE;
+import mjc.tdm.Signature;
 import mjc.tdm.TDM;
 import mjc.tds.TDS;
 
 public class X86 extends AbstractMachine {
+	@Override
+	public String genAutoCode(List<COUPLE<String, Signature>> l,TDS tds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genObtenirClasse(TDS tds, String classecherche) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	@Override
 	public String genPop(int dep, int taille, String commentaire) {
 		// TODO Auto-generated method stub

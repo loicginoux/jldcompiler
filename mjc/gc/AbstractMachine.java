@@ -3,8 +3,11 @@ package mjc.gc;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 import mjc.compiler.MJCException;
+import mjc.lib.COUPLE;
+import mjc.tdm.Signature;
 import mjc.tdm.TDM;
 import mjc.tds.TDS;
 
@@ -59,5 +62,7 @@ public abstract class AbstractMachine {
 	public abstract String genMalloc(int taille,String nomtype);
 	public abstract String genLoadL(String value);
 	public abstract String genPop(int dep,int taille,String commentaire);
+	public abstract String genObtenirClasse(TDS tds,String classecherche);
+	public abstract String genAutoCode(List<COUPLE<String, Signature>> l,TDS tds);
 	
 }

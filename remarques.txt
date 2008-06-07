@@ -1,24 +1,25 @@
 protected = public dans notre cas car on ne gere pas les packages.
 TODO OU XXX
 
-typage
-surcharge de fonction
-appel tardif
-attributs statique
-methode statique tds a completer
-pop le retour quand il n'est pas utilise
-return pour les statiques plus complexe
-attention -1 impossible en tam
-gestion du return
-revoir le chercher globalement de la tdm pour la surcharge
-revoir la visibilite des attributs des classes etendues --FIXED
-nom classe = nom fichier -- FIXED
-probleme import pour la tdm de new TYPE --FIXED
-probleme import = include dans la generation --FIXED
-bug acces super implicite  --FIXED
-appel super obligatoire
-verification constructeur par defo
-bug etiquette call sous-classe
+1.typage
+2.surcharge de fonction
+3.appel tardif OBLIGATOIRE cf pt 19
+4.attributs statique
+5.methode statique tds a completer
+6.pop le retour quand il n'est pas utilise
+7.return pour les statiques plus complexe
+8.attention -1 impossible en tam
+9.gestion du return
+10.revoir le chercher globalement de la tdm pour la surcharge
+11.revoir la visibilite des attributs des classes etendues --FIXED
+12.nom classe = nom fichier -- FIXED
+13.probleme import pour la tdm de new TYPE --FIXED
+14.probleme import = include dans la generation --FIXED
+15.bug acces super implicite  --FIXED
+16.appel super obligatoire
+17.verification constructeur par defo
+18.bug etiquette call sous-classe --FIXED
+19.heritage de fonction implicite devient explicite --FIXED
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
