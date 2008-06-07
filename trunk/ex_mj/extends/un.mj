@@ -4,4 +4,7 @@ class un{
 	public un(){
 		un_param=1;
 	}
+	
+	public void totoun(){
+	}
 }

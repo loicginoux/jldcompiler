@@ -11,6 +11,9 @@ class deux extends un{
 		syso(un_param);
 	}
 	
+	public void totodeux(){
+	}
+	
 	public static void main(){
 		deux d = new deux();
 	}

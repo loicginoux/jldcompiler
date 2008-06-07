@@ -131,6 +131,25 @@ public class Signature implements Serializable {
 	public void setMaclasse(String maclasse) {
 		this.maclasse = maclasse;
 	}
+	
+	public Signature clone(){
+		Signature s=new Signature();
+		
+		s.maclasse=new String(maclasse);
+		if(retour!=null)
+			s.retour=new String(retour);
+		s.statique=statique;
+		s.visibility=visibility;
+		
+		List<String> ls=new Vector<String>();
+		for(String ss:params){
+			ls.add(ss);
+		}
+		
+		s.params = ls;
+		
+		return s;
+	}
 
 
 }
