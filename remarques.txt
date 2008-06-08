@@ -20,6 +20,7 @@ TODO OU XXX
 17.verification constructeur par defo
 18.bug etiquette call sous-classe --FIXED
 19.heritage de fonction implicite devient explicite --FIXED
+20.verifier que le constructeur a le meme nom que la classe --FIXED
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet

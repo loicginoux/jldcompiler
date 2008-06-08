@@ -61,6 +61,7 @@ public abstract class AbstractMachine {
 	public abstract String genCall(String nom);
 	public abstract String genMalloc(int taille,String nomtype);
 	public abstract String genLoadL(String value);
+	public abstract String genLoad(int taille,int dep,String registre);
 	public abstract String genPop(int dep,int taille,String commentaire);
 	public abstract String genObtenirClasse(TDS tds,String classecherche);
 	public abstract String genAutoCode(List<COUPLE<String, Signature>> l,TDS tds);
