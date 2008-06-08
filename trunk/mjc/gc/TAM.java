@@ -160,6 +160,11 @@ public class TAM extends AbstractMachine {
 	public String genLoadL(String value){
 		return "\tLOADL " + value + "\n";
 	}
+	@Override
+	public String genLoad(int taille, int dep, String registre) {
+		return "\tLOAD ("+taille+") "+dep+"["+registre+
+		"]\n";
+	}
 
 
 	public String genTrue() {

@@ -9,6 +9,11 @@ import mjc.tds.TDS;
 
 public class X86 extends AbstractMachine {
 	@Override
+	public String genLoad(int taille, int dep, String registre) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
 	public String genAutoCode(List<COUPLE<String, Signature>> l,TDS tds) {
 		// TODO Auto-generated method stub
 		return null;

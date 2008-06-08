@@ -50,5 +50,7 @@ class Point {
 		    m.init((x + p.x)/2, (y + p.y)/2);
 		    return m;
 	  }
+	  
+	  
   
 }

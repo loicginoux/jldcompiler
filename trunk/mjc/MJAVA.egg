@@ -266,9 +266,9 @@ DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code #tdmau
 	        --- savoir si la classe est etendu
 	        t := DEFCLASSE^tdt.getMonType();
 	        if t.getClassExtends()=nil then
-	            DEFS^depatt := 0; 
+	            DEFS^depatt := 1; 
 	        else
-	            DEFS^depatt := 1; -- pour le super
+	            DEFS^depatt := 2; -- pour le super
 	        end
 	    end
     }
@@ -580,7 +580,7 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
 	            ---- passage du this ou non -----
 	            if DEF^visibilitySyn.getDroite() then
 	                write(ident^txt+" statique : pas encore traite a donf\n");
-	                BLOC^tds := tds; --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
+	                BLOC^tds := new TDS(); --XXX reflechir attention a kan une methode utilise sa propre classe !!! (getplushaute)
 	            else
 	                i := new INFO();
 	                call i.setType(DEF^tdt.getClassname());
@@ -643,10 +643,21 @@ DEF -> void ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tail
     }
 
 -- constructeur -----------------------------------------------------------------------------------
-DEF -> ident  paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt ; 
+DEF -> ident #tdt paro #tds PARFS #tdm #tdsap parf #dep BLOC #code #debug #tailleatt ; 
     global
         tds : TDS;
         s : Signature;
+    #tdt {
+        local
+            t:String;
+        do
+            t:= DEF^tdt.getClassname();
+            if t.equals(ident^txt) then
+            else
+                error(B_22,ident^txt);
+            end
+        end
+    }
     #tds {
 	    do
 	        tds := new TDS(DEF^tds);
@@ -1420,7 +1431,15 @@ F -> nouveau  TYPE #tdt #tdm paro ARGS parf #code ;
             type : Type;
         do
             type := F^tdt.chercherGlobalement(TYPE^nom);
-            code := F^machine.genMalloc(type.getTaille(),TYPE^nom); --ici on a le this ds la pile
+            code := F^machine.genMalloc(type.getTaille()+1,TYPE^nom); --ici on a le this ds la pile
+            code := code + F^machine.genLoadL(TYPE^nom)
+            + F^machine.genLoad(1,-2,"SB");
+            if type.getClassExtends() = nil then
+            else
+                code := code + F^machine.genLoadL("1")
+                +F^machine.genPlus();
+            end
+            code := code + F^machine.genStore();
             code := code + ARGS^code; --code des args
             code := code + F^machine.genCall(
                 TYPE^nom+"_"+TYPE^nom + "_" + s.getStringParams());
@@ -1658,9 +1677,16 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
                 end
             end
             
-            code := code+ F^machine.genCall(
-                F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams())+
-                Q^code;
+            if s.isStatique() then
+	            code := code+ F^machine.genCall(
+	                s.getMaclasse()+"_"+ident^txt + "_" + s.getStringParams())+
+	                Q^code;
+            else
+                code := code+ F^machine.genCall(
+                    F^tdt.getClassname()+"_"+ident^txt + "_" + s.getStringParams())+
+                    Q^code;
+            end
+            
             F^code := code;
           else --attribut
 	          code := F^machine.genExprIdent(F^tds, ident^txt);

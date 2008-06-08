@@ -9,6 +9,11 @@ import mjc.tds.TDS;
 
 public class SPARC extends AbstractMachine {
 	@Override
+	public String genLoad(int taille, int dep, String registre) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
 	public String genAutoCode(List<COUPLE<String, Signature>> l,TDS s) {
 		// TODO Auto-generated method stub
 		return null;

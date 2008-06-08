@@ -5,6 +5,11 @@ class un{
 		un_param=1;
 	}
 	
-	public void totoun(){
+	public void totoun(int un_param){
+		this.un_param=2;
+	}
+	
+	public static void statun(){
+		un u = new un();
 	}
 }
