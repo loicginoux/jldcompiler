@@ -1432,8 +1432,8 @@ F -> nouveau  TYPE #tdt #tdm paro ARGS parf #code ;
         do
             type := F^tdt.chercherGlobalement(TYPE^nom);
             code := F^machine.genMalloc(type.getTaille()+1,TYPE^nom); --ici on a le this ds la pile
-            code := code + F^machine.genLoadL(TYPE^nom)
-            + F^machine.genLoad(1,-2,"SB");
+            code := code + F^machine.genLoadL("\""+TYPE^nom+"\"")
+            + F^machine.genLoad(1,-2,"ST");
             if type.getClassExtends() = nil then
             else
                 code := code + F^machine.genLoadL("1")
