@@ -192,6 +192,7 @@ PROGRAMME -> #init  IMPORTS #tds #tdt #tdm DEFCLASSE #verifnom #gen #sauv #linka
             if main /= nil then -- il y a un main
                 if main.isStatique() then
                     code := fac.genLinkageImports(tdt, machine);
+                    code := code + fac.genLinkageTardif(tdt.getClassname(),machine);
                     code := machine.genLinkage(code+DEFCLASSE^code, tdt.getClassname());
                     call machine.writeCode(PROGRAMME^source.getFileName() + "_exe", code);
                 else
@@ -1642,6 +1643,7 @@ F ->  ident #ismethode #aff #tdsmcourante Q #code ;
                 ------ fin gestion -------------
                 
 	            if classname.equals(maclasse) then
+
 	                Q^tdscourante := F^tds.getPlusHaute();
 	                Q^tdmcourante := F^tdm;
 	            else

@@ -29,9 +29,11 @@ public abstract class AbstractMachine {
 	public abstract String genCond(String codeBloc1, String codeBloc2);
 	public abstract String genWhile(String condition, String bloc);
 	public abstract String genReturn(String nomMethode, TDM tdm);
+	public abstract String genReturn(int n,int d);
 	public abstract String genDefMethode(String nomMethode);
 	public abstract String genExprIdent(TDS tds, String ident);
 	public abstract String genExprIdent(int dep, String ident);
+	public abstract String genExprIdent(String etiquette);
 	public abstract String genLinkage(String code, String className);
 	public abstract String genTrue();
     public abstract String genFalse();
@@ -65,5 +67,8 @@ public abstract class AbstractMachine {
 	public abstract String genPop(int dep,int taille,String commentaire);
 	public abstract String genObtenirClasse(TDS tds,String classecherche);
 	public abstract String genAutoCode(List<COUPLE<String, Signature>> l,TDS tds);
+	public abstract String genConcat();
+	public abstract String genSCompare();
+	public abstract String genFatalError();
 	
 }

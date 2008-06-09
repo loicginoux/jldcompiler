@@ -5,8 +5,8 @@ class un{
 		un_param=1;
 	}
 	
-	public void totoun(int un_param){
-		this.un_param=2;
+	public int getun_param(){
+		return un_param;
 	}
 	
 	public static void statun(){

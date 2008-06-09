@@ -9,6 +9,31 @@ import mjc.tds.TDS;
 
 public class SPARC extends AbstractMachine {
 	@Override
+	public String genFatalError() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genReturn(int n, int d) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genExprIdent(String etiquette) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genSCompare() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String genConcat() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
 	public String genLoad(int taille, int dep, String registre) {
 		// TODO Auto-generated method stub
 		return null;
