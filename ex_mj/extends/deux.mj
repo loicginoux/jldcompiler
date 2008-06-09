@@ -6,17 +6,16 @@ class deux extends un{
 	public deux(){
 		super = new un();
 		deux_param=2;
-		syso(un_param);
-		un_param=deux_param;
-		syso(un_param);
 	}
 	
-	public static void totodeux(){
-		statun();
+	public void totodeux(){
+		syso(3);
 	}
 	
 	public static void main(){
 		deux d = new deux();
+		//d.getun_param();
+		d.totodeux();
 	}
 	
 }

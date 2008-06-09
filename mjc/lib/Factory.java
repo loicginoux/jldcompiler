@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Vector;
 
 import mjc.gc.AbstractMachine;
@@ -108,6 +109,62 @@ public class Factory {
 			res += chargerCode(classToImport + "_code");
 		}
 		return "\t\t; imports\n" + res + "\t\t; fin imports\n\n";
+	}
+	
+	public static String genLinkageTardif(String classname,AbstractMachine machine){
+		TDM tdm;
+		String code;
+		
+		tdm = chargerTDM(classname);
+		List<String> l = new Vector<String>();
+		for(String s : tdm.keySet()){
+			
+			if(!s.startsWith(classname)
+				&& !tdm.get(s).isStatique()){
+				l.add(classname+"_"+s);
+			}
+		}
+		
+		for(String classe : imports){
+			tdm =  chargerTDM(classe);
+			for(String s : tdm.keySet()){
+				if(!s.startsWith(classe)
+					&& !tdm.get(s).isStatique()){
+					l.add(classe+"_"+s);
+				}
+			}
+			
+		}
+		
+		/*
+		System.out.println("");
+		for(String ss : l){
+			System.out.println(ss);
+		}
+		System.out.println("");
+		*/
+		
+		code="\t;--- appel tardif auto-generation ---\n";
+		code+="auto_tardif\n";
+		code+=machine.genLoad(1, -2, "LB")+
+			  machine.genLoadL("\"_\"")+
+			  machine.genConcat()+
+			  machine.genLoad(1, -1, "LB")+
+			  machine.genConcat();
+		for(String ss:l){
+			code +=";---"+ss+"---\n"+
+					machine.genLoad(1, 3, "LB")+
+					machine.genLoadL("\""+ss+"\"")+
+					machine.genSCompare()+
+					machine.genCond(
+							machine.genExprIdent(ss)+
+							machine.genReturn(1, 2), "");
+		}
+		code+=machine.genFatalError();
+		code+="\t;--- fin appel tardif ---\n\n";
+		
+		
+		return code;
 	}
 	
 	private static void getClassImported(TDT tdt) {

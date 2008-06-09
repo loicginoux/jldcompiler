@@ -86,6 +86,10 @@ public class TAM extends AbstractMachine {
 		return res;
 	}
 
+	public String genReturn(int n, int d) {
+		return "\tRETURN ("+n+") "+d+"\n";
+	}
+
 	public String genExprValeur(String f, String op) {
 		return 	f +
 		"\n\tLOADI (1)\t\t; on charge la valeur\n" +
@@ -150,6 +154,10 @@ public class TAM extends AbstractMachine {
 
 	public String genExprIdent(int dep, String ident) {
 		return "\tLOADA " + dep + "[LB]\t\t; @ "+ident+"\n";
+	}
+	
+	public String genExprIdent(String etiquette) {
+		return "\tLOADA " + etiquette +"\n";
 	}
 
 	public String genDefMethode(String nomMethode) {
@@ -245,6 +253,14 @@ public class TAM extends AbstractMachine {
 
 	public String genEt() {
 		return "\tSUBR BAnd\n";
+	}
+
+	public String genConcat() {
+		return "\tSUBR SConcat\n";
+	}
+	
+	public String genSCompare() {
+		return "\tSUBR SCompare\n";
 	}
 
 	// compteur pour le generateur d'etiquettes
@@ -347,6 +363,10 @@ public class TAM extends AbstractMachine {
 			return code;
 		}else
 			return "";
+	}
+
+	public String genFatalError() {
+		return genLoadL("\"FATAL ERROR\"")+genSyso("string")+genFin();
 	}
 
 }
