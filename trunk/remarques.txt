@@ -5,7 +5,7 @@ TODO OU XXX
 2.surcharge de fonction
 3.appel tardif OBLIGATOIRE cf pt 19
 4.attributs statique
-5.methode statique tds a completer
+5.methode statique tds a completer --FIXED
 6.pop le retour quand il n'est pas utilise
 7.return pour les statiques plus complexe
 8.attention -1 impossible en tam
@@ -21,7 +21,7 @@ TODO OU XXX
 18.bug etiquette call sous-classe --FIXED
 19.heritage de fonction implicite devient explicite --FIXED
 20.verifier que le constructeur a le meme nom que la classe --FIXED
-21. bug etiquette
+21. bug etiquette --FIXED
 
 ATTENTION : 
 type de retour d'un constructeur : VOID c'est "NEW Obj()" qui a le type de lobjet
