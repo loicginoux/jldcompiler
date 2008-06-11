@@ -3,8 +3,8 @@ TODO OU XXX
 
 1.typage
 2.surcharge de fonction
-3.appel tardif OBLIGATOIRE cf pt 19
-4.attributs statique
+3.appel tardif OBLIGATOIRE cf pt 19 --FIXED
+4.attributs statique --ABORT
 5.methode statique tds a completer --FIXED
 6.pop le retour quand il n'est pas utilise
 7.return pour les statiques plus complexe
