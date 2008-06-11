@@ -267,8 +267,8 @@ public class TAM extends AbstractMachine {
 	private static int cpt = 0;
 
 	// genere une etiquette differente des autres
-	public static String genEtiq() {
-		return "X" + cpt++;
+	public String genEtiq() {
+		return classname+"_X" + cpt++;
 	}
 
 	// genere le code pour l'arret de la machine

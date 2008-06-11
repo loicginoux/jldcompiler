@@ -237,10 +237,15 @@ IMPORTS -> import ident pv IMPORTS #tdts ;
 	}
 
 -- definition d'une classe ------------------------------------------------------------------------
-DEFCLASSE ->  classe ident #tdt #tdm EXTENSION aco #attdep DEFS acf #code #tdmauto #codeauto ;
+DEFCLASSE ->  classe ident #init #tdt #tdm EXTENSION aco #attdep DEFS acf #code #tdmauto #codeauto ;
 	global
         auto_sigs:List<COUPLE<String,Signature>>;
         code : String;
+    #init {
+        do
+            call DEFCLASSE^machine.setClassname(ident^txt);
+        end
+    }
     #tdt {
 		local 
 		    type : Type;

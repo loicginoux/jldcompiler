@@ -12,6 +12,7 @@ import mjc.tdm.TDM;
 import mjc.tds.TDS;
 
 public abstract class AbstractMachine {
+	protected String classname;
 	public abstract String getSuffixe();
 
 	public void writeCode(String fname, String code) throws MJCException {
@@ -70,5 +71,13 @@ public abstract class AbstractMachine {
 	public abstract String genConcat();
 	public abstract String genSCompare();
 	public abstract String genFatalError();
+
+	public String getClassname() {
+		return classname;
+	}
+
+	public void setClassname(String classname) {
+		this.classname = classname;
+	}
 	
 }
