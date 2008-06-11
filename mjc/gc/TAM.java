@@ -337,8 +337,7 @@ public class TAM extends AbstractMachine {
 				code += ";---auto-generation methode heritee "
 					+c.getGauche()+"---\n";
 				code += tds.getClassname()+"_"+
-						c.getGauche()+
-						c.getDroite().getStringParams()+"\n";
+						c.getGauche()+"\n";
 				//load le this
 				code += genExprIdent(-1-taille, "this");
 				code += genLoadI("this");
@@ -352,7 +351,7 @@ public class TAM extends AbstractMachine {
 				}
 				//generer l'etiquette
 				code += genCall(appart+"_"+
-						c.getGauche()+c.getDroite().getStringParams());
+						c.getGauche());
 				//generer le return
 				code += "\t" + "RETURN (" + sizeret + ") " 
 						+ (c.getDroite().size()+1) +"\n";
