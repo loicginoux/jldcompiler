@@ -62,6 +62,7 @@ public abstract class AbstractMachine {
 	public abstract String genLoadI(String s);
 	public abstract String genReserve(String nom);
 	public abstract String genCall(String nom);
+	public abstract String genCallI();
 	public abstract String genMalloc(int taille,String nomtype);
 	public abstract String genLoadL(String value);
 	public abstract String genLoad(int taille,int dep,String registre);

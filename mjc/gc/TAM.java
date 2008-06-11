@@ -364,6 +364,10 @@ public class TAM extends AbstractMachine {
 		}else
 			return "";
 	}
+	@Override
+	public String genCallI() {
+		return "\tCALLI\n";
+	}
 
 	public String genFatalError() {
 		return genLoadL("\"FATAL ERROR\"")+genSyso("string")+genFin();

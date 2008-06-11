@@ -157,8 +157,9 @@ public class Factory {
 					machine.genLoadL("\""+ss+"\"")+
 					machine.genSCompare()+
 					machine.genCond(
+							machine.genLoadL("0")+ //LB
 							machine.genExprIdent(ss)+
-							machine.genReturn(1, 2), "");
+							machine.genReturn(2, 2), "");
 		}
 		code+=machine.genFatalError();
 		code+="\t;--- fin appel tardif ---\n\n";

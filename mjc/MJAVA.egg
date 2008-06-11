@@ -321,7 +321,7 @@ EXTENSION -> etend ident #tdt #tds #tdm ; -- le code est deja insere dans les im
 		    fac := new Factory();
 		    call EXTENSION^tds.setParente(fac.chargerTDS(ident^txt));
 		    i := new INFO();
-		    call i.setDep(0); -- TODO plus tard
+		    call i.setDep(1); -- place 1 apres le nom
 		    call i.setStatique(false);
 		    call i.setVisibility(1); -- le super est private
 		    call i.setType(ident^txt);
@@ -1440,11 +1440,7 @@ F -> nouveau  TYPE #tdt #tdm paro ARGS parf #code ;
             code := F^machine.genMalloc(type.getTaille()+1,TYPE^nom); --ici on a le this ds la pile
             code := code + F^machine.genLoadL("\""+TYPE^nom+"\"")
             + F^machine.genLoad(1,-2,"ST");
-            if type.getClassExtends() = nil then
-            else
-                code := code + F^machine.genLoadL("1")
-                +F^machine.genPlus();
-            end
+           
             code := code + F^machine.genStore();
             code := code + ARGS^code; --code des args
             code := code + F^machine.genCall(
@@ -1856,6 +1852,7 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
     #code {
         local
             code:String;
+            size:int;
         do
             if ismethode then
                 if s.isStatique() then
@@ -1870,11 +1867,18 @@ Q ->  pt ident #ismethode #aff #tdsmcourante Q #code ;
                     
                 else 
                     --dynamic
+                     size := -1-s.size();
                      code :=  ""--Q^machine.genObtenirClasse(Q^tdscourante,s.getMaclasse())
-                            +  Q1^codeargs
-                            + Q^machine.genCall(Q^tdmcourante.getClassname()+
-                                                "_"+ident^txt + "_" + 
-                                                s.getStringParams())
+                            + Q1^codeargs
+                            + Q^machine.genLoad(1,size,"ST") --mettre this davant
+                            + Q^machine.genLoadI("nom objet")
+                            + Q^machine.genLoadL("\""+ident^txt + "_" + 
+                                                s.getStringParams()+"\"") --mettre nom methode
+                            --+ Q^machine.genCall(Q^tdmcourante.getClassname()+
+                            --                    "_"+ident^txt + "_" + 
+                            --                    s.getStringParams())
+                            + Q^machine.genCall("auto_tardif")
+                            + Q^machine.genCallI()
                             + Q1^code;
                 end
             else
