@@ -1,0 +1,23 @@
+import PointCol;
+
+class Erreur_assignation {
+
+		public static int fact(int n) {
+				if(n <1) { 
+			    		return 1; 
+			    } else {
+			    		return n * fact(n-1);
+			    }
+		}
+
+		public Erreur_assignation() {
+				this = new PointCol(2, 4, 24);
+				this.fact(3);
+		}
+		
+		public static void main() {
+				PointCol pc = new PointCol(2, 4, 24);
+				syso(fact(pc.gety()));
+		}
+
+}
