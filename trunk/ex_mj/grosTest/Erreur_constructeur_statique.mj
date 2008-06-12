@@ -1,0 +1,53 @@
+class Erreur_constructeur_statique {
+
+	  protected int x;
+	  protected int y;
+	  private int privateField;
+	
+	  public static Erreur_constructeur_statique(int a, int b){
+		    x = a;
+		    y = b;
+	  }
+	
+	  public int getx() {
+		    return x;
+	  }
+	  
+	  public int gety() {
+		    return y;
+	  }
+	    
+	  public void setx(int l) {
+		    x = l;
+	  }
+	    
+	  public void sety(int l) {
+		    y = l;
+	  }
+	  
+	  public void init (int xi,int yi) {
+		    x = xi;
+		    y = yi;
+	  }
+	        
+	  public void xtrans(int d){
+		    x = getx() + d;
+	  }
+	
+	  public void ytrans(int d){
+		    y = y + d;
+	  }
+	  
+	  private Point getmoi(int x){
+
+	  }
+	    
+	  public Point milieu (Point p){
+		    Point m = new Point();
+		    m.init((x + p.x)/2, (y + p.y)/2);
+		    return m.getmoi(8).getmoi(10);
+	  }
+	  
+	  
+  
+}

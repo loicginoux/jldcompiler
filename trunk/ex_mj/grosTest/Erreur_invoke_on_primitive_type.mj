@@ -1,0 +1,19 @@
+import PointCol;
+
+class Erreur_invoke_on_primitive_type {
+
+		public static int fact(int n) {
+				n.gety();
+				if(n <1) { 
+			    		return 1; 
+			    } else {
+			    		return n * fact(n-1);
+			    }
+		}
+		
+		public static void main() {
+				PointCol pc = new PointCol(2, 4, 24);
+				syso(fact(pc.gety()));
+		}
+
+}

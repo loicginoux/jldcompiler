@@ -1,0 +1,18 @@
+import PointCol;
+
+class Erreur_appel_non_statique_dans_methode_statique {
+
+		public int fact(int n) {
+				if(n <1) { 
+			    		return 1; 
+			    } else {
+			    		return n * fact(n-1);
+			    }
+		}
+		
+		public static void main() {
+				PointCol pc = new PointCol(2, 4, 24);
+				syso(fact(pc.gety()));
+		}
+
+}
